@@ -13,7 +13,7 @@ public class TravelService {
 
     @GetMapping("/about")
     public String showInfo() {
-        return "Приложение по поиску попутчиков";
+        return "Приложение по поиску попутчиков.";
     }
 
 }
