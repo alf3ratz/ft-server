@@ -22,5 +22,8 @@ public class UserEntity {
     private String username = "";
 
     @Builder.Default
+    private String email = "";
+
+    @Builder.Default
     private Long travelId = 0l;
 }
