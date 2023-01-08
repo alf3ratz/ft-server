@@ -9,9 +9,9 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     UserEntity getUserEntityByEmail(String userEmail);
 
-    @Query("update u from user_jn u " +
+    @Query(value="update u from user_jn u " +
             "set u.travel_id = :travelId" +
-            " where t.email = :userEmail ")
+            " where t.email = :userEmail ", nativeQuery = true)
     void updateTravelAtUserEntityByEmail(String userEmail, Long travelId);
 
 

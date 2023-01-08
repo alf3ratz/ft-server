@@ -7,8 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.alferatz.ftserver.model.TravelDto;
-import ru.alferatz.ftserver.repository.TravelRepository;
-import ru.alferatz.ftserver.repository.entity.TravelEntity;
+import ru.alferatz.ftserver.model.UserDto;
 import ru.alferatz.ftserver.service.TravelService;
 
 @RequestMapping("/api/fellow")
@@ -21,13 +20,28 @@ public class TravelController {
     @PostMapping("/create")
     public TravelDto createTravel(@RequestBody TravelDto travelDto) {
         var newTravelEntity = travelService.createTravel(travelDto);
-        return conversionService.convert(newTravelEntity, TravelDto.class);
+        //return conversionService.convert(newTravelEntity, TravelDto.class);
+        return TravelDto.builder()
+                .author(newTravelEntity.getAuthor())
+                .countOfParticipants(newTravelEntity.getCountOfParticipants())
+                .placeFrom(newTravelEntity.getPlaceFrom())
+                .placeTo(newTravelEntity.getPlaceTo())
+                .build();
     }
 
     @PostMapping("/update")
     public TravelDto updateTravel(@RequestBody TravelDto travelDto) {
         var updatedTravelEntity = travelService.updateTravel(travelDto);
         return conversionService.convert(updatedTravelEntity, TravelDto.class);
+
+    }
+
+    @PostMapping("/delete")
+    public Integer deleteTravel(@RequestBody TravelDto travelDto) {
+        //var deletedTravelEntity =
+        return travelService.deleteTravel(travelDto);
+        //return conversionService.convert(deletedTravelEntity, TravelDto.class);
+        //return TravelDto.builder().author(new UserDto()).build();
     }
 
 
