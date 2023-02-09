@@ -7,6 +7,7 @@ import ru.alferatz.ftserver.model.UserDto;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 @Getter
 @Setter
@@ -15,7 +16,7 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @Entity
 @Table(name = "travel_jn")
-public class TravelEntity {
+public class TravelEntity  {
     @Id
     @Builder.Default
     private Long id = 0L;
