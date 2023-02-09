@@ -13,7 +13,10 @@ public class TravelDto {
 
     @NonNull
     @JsonProperty("author")
-    private UserDto author;
+    private String author;
+
+    @JsonProperty("email")
+    private String email;
 
     @NonNull
     @JsonProperty("placeFrom")
