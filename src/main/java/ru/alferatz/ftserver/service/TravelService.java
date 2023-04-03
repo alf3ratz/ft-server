@@ -130,27 +130,26 @@ public class TravelService {
     return travelEntity;
   }
 
-//  public TravelEntity updateTravel(TravelDto travelDto) {
-//    TravelEntity travelEntity = checkTravel(travelDto);
-//    var travelEntityFromDto = conversionService.convert(travelDto, TravelEntity.class);
-//    if (isTravelChanged(travelEntityFromDto, travelDto)) {
-//      travelEntity.setCountOfParticipants(travelDto.getCountOfParticipants());
-//      // TODO: подумать, как обновлять участников без полного цикла for (может быть лишняя работа)
-//      travelDto.getParticipants()
-//          .forEach(i -> linkParticipantToTravel(i.getEmail(), travelEntity.getId()));
-//      travelEntity.setPlaceFrom(travelDto.getPlaceFrom());
-//      travelEntity.setPlaceTo(travelDto.getPlaceTo());
-//      try {
-//        travelRepository.save(travelEntity);
-//        return travelEntity;
-//      } catch (RuntimeException ex) {
-//        throw new InternalServerError("Не удалось обновить поездку в базе");
-//      } finally {
-//        travelRepository.flush();
-//      }
-//    }
-//    return travelEntity;
-//  }
+  public TravelEntity updateTravel(TravelDto travelDto) {
+    TravelEntity travelEntity = checkTravel(travelDto);
+    //var travelEntityFromDto = conversionService.convert(travelDto, TravelEntity.class);
+    if (isTravelChanged(travelEntity, travelDto)) {
+      travelEntity.setCountOfParticipants(travelDto.getCountOfParticipants());
+      // TODO: подумать, как обновлять участников без полного цикла for (может быть лишняя работа)
+      travelEntity.setCountOfParticipants(travelDto.getCountOfParticipants());
+      travelEntity.setPlaceFrom(travelDto.getPlaceFrom());
+      travelEntity.setPlaceTo(travelDto.getPlaceTo());
+      try {
+        travelRepository.save(travelEntity);
+        return travelEntity;
+      } catch (RuntimeException ex) {
+        throw new InternalServerError("Не удалось обновить поездку в базе");
+      } finally {
+        travelRepository.flush();
+      }
+    }
+    return travelEntity;
+  }
 
   /**
    * Проверяем, правильный ли объект пришел и есть ли поездка в базе

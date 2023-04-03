@@ -37,11 +37,11 @@ public class TravelController {
         .build();
   }
 
-//  @PostMapping("/update")
-//  public TravelDto updateTravel(@RequestBody TravelDto travelDto) {
-//    var updatedTravelEntity = travelService.updateTravel(travelDto);
-//    return conversionService.convert(updatedTravelEntity, TravelDto.class);
-//  }
+  @PostMapping("/updateTravel")
+  public TravelDto updateTravel(@RequestBody TravelDto travelDto) {
+    var updatedTravelEntity = travelService.updateTravel(travelDto);
+    return conversionService.convert(updatedTravelEntity, TravelDto.class);
+  }
 
   @PostMapping("/addTraveller")
   public TravelDto addParticipantToTravel(@RequestBody TravelDto travelDto) {
