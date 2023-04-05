@@ -2,10 +2,8 @@ package ru.alferatz.ftserver.repository;
 
 import java.util.List;
 import java.util.Optional;
-import org.apache.catalina.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import ru.alferatz.ftserver.repository.entity.TravelEntity;
 import ru.alferatz.ftserver.repository.entity.UserEntity;
 
 public interface UserRepository extends JpaRepository<UserEntity, Long> {

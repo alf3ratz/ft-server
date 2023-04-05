@@ -16,23 +16,27 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Entity
 @Table(name = "travel_jn")
-public class TravelEntity  {
-    @Id
-    @Builder.Default
-    private Long id = 0L;
+public class TravelEntity {
 
-    @Builder.Default
-    private String author = "";
+  @Id
+  @Builder.Default
+  private Long id = 0L;
 
-    @Builder.Default
-    private String placeFrom = "";
+  @Builder.Default
+  private String author = "";
 
-    @Builder.Default
-    private String placeTo = "";
+  @Builder.Default
+  private String placeFrom = "";
 
-    @Builder.Default
-    private Integer countOfParticipants = 0;
+  @Builder.Default
+  private String placeTo = "";
 
-    @Builder.Default
-    private String travelStatus = "";
+  @Builder.Default
+  private Integer countOfParticipants = 0;
+
+  @Builder.Default
+  private String travelStatus = "";
+
+  @Builder.Default
+  private String comment = "";
 }

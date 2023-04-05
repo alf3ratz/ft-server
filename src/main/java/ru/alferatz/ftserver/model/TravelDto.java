@@ -11,24 +11,27 @@ import java.util.List;
 @Builder
 public class TravelDto {
 
-    @NonNull
-    @JsonProperty("author")
-    private String author;
+  @NonNull
+  @JsonProperty("author")
+  private String author;
 
-    @JsonProperty("email")
-    private String email;
+  @JsonProperty("email")
+  private String email;
 
-    @NonNull
-    @JsonProperty("placeFrom")
-    private String placeFrom;
+  @NonNull
+  @JsonProperty("placeFrom")
+  private String placeFrom;
 
-    @NonNull
-    @JsonProperty("placeTo")
-    private String placeTo;
+  @NonNull
+  @JsonProperty("placeTo")
+  private String placeTo;
 
-    @JsonProperty("participants")
-    private List<UserDto> participants;
+  @JsonProperty("participants")
+  private List<UserDto> participants;
 
-    @JsonProperty("countOfParticipants")
-    private Integer countOfParticipants;
+  @JsonProperty("countOfParticipants")
+  private Integer countOfParticipants;
+
+  @Builder.Default
+  private String comment = "";
 }

@@ -21,4 +21,7 @@ public interface TravelRepository extends JpaRepository<TravelEntity, Long> {
   Optional<TravelEntity> getTravelEntitiesByAuthor(String author);
 
   Integer deleteTravelEntityByAuthor(String author);
+
+  @Query(value = "SELECT new TravelEntity (MAX (t.id),t.author,t.placeFrom,t.placeTo,t.countOfParticipants,t.travelStatus,t.comment ) FROM TravelEntity t GROUP BY t")
+  Optional<TravelEntity> getTravelEntityWithMaxId();
 }

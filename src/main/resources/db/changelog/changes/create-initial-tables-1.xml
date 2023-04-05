@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+  <changeSet author="admin" id="1">
+    <createTable tableName="travel_jn">
+      <column autoIncrement="true" name="id" type="BIGINT">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="author" type="VARCHAR(50)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="place_from" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="place_to" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="count_of_participants" type="INT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="travel_status" type="VARCHAR(20)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="comment" type="VARCHAR(255)">
+        <constraints nullable="true"/>
+      </column>
+    </createTable>
+    <createTable tableName="user_jn">
+      <column autoIncrement="true" name="id" type="BIGINT">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="author" type="VARCHAR(50)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="username" type="VARCHAR(50)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="email" type="VARCHAR(50)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="travel_id" type="BIGINT">
+        <constraints nullable="true"/>
+      </column>
+    </createTable>
+  </changeSet>
+</databaseChangeLog>

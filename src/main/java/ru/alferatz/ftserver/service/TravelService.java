@@ -41,9 +41,17 @@ public class TravelService {
     if (travelEntity != null) {
       throw new AlreadyExistException("У пользователя уже имеется активная поездка");
     }
-    travelEntity = new TravelEntity(1L, travelDto.getAuthor(),
+    var lastTravelEntity = travelRepository.getTravelEntityWithMaxId().orElse(null);
+    Long travelId = 0L;
+    if (lastTravelEntity == null) {
+      travelId = 1L;
+    } else {
+      travelId = lastTravelEntity.getId() + 1L;
+    }
+    travelEntity = new TravelEntity(travelId, travelDto.getAuthor(),
         travelDto.getPlaceFrom(), travelDto.getPlaceTo(),
-        travelDto.getCountOfParticipants(), TravelStatusEnum.CREATED.name());
+        travelDto.getCountOfParticipants(), TravelStatusEnum.CREATED.name(),
+        travelDto.getComment());
     try {
       travelRepository.save(travelEntity);
       return travelEntity;
@@ -139,6 +147,7 @@ public class TravelService {
       travelEntity.setCountOfParticipants(travelDto.getCountOfParticipants());
       travelEntity.setPlaceFrom(travelDto.getPlaceFrom());
       travelEntity.setPlaceTo(travelDto.getPlaceTo());
+      travelEntity.setComment(travelDto.getComment());
       try {
         travelRepository.save(travelEntity);
         return travelEntity;
@@ -182,7 +191,10 @@ public class TravelService {
     // Проверяем на изменения в количестве участников, месте посадки и высадки
     return !travelEntity.getCountOfParticipants().equals(travelDto.getCountOfParticipants()) ||
         !travelEntity.getPlaceFrom().equals(travelDto.getPlaceFrom()) ||
-        !travelEntity.getPlaceTo().equals(travelDto.getPlaceTo());
+        !travelEntity.getPlaceTo().equals(travelDto.getPlaceTo()) ||
+        !travelEntity.getComment().trim().toLowerCase(Locale.ROOT)
+            .equals(travelDto.getComment().trim().toLowerCase(
+                Locale.ROOT));
   }
 
   private void linkParticipantToTravel(String participantEmail, Long travelId) {
