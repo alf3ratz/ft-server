@@ -2,6 +2,8 @@ package ru.alferatz.ftserver.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.alferatz.ftserver.exceptions.AlreadyExistException;
@@ -12,7 +14,7 @@ import ru.alferatz.ftserver.model.TravelDto;
 import ru.alferatz.ftserver.repository.TravelRepository;
 import ru.alferatz.ftserver.repository.UserRepository;
 import ru.alferatz.ftserver.repository.entity.TravelEntity;
-import ru.alferatz.ftserver.utils.enums.TravelStatusEnum;
+import ru.alferatz.ftserver.utils.enums.TravelStatus;
 
 import java.util.*;
 
@@ -26,10 +28,10 @@ public class TravelService {
   private final TravelRepository travelRepository;
   private final UserRepository userRepository;
   private final Set<String> statusesExceptClosed = new HashSet<>(Arrays
-      .asList(TravelStatusEnum.CREATED.name(), TravelStatusEnum.PROCESSING.name(),
-          TravelStatusEnum.IN_PROGRESS.name()));
+      .asList(TravelStatus.CREATED.name(), TravelStatus.PROCESSING.name(),
+          TravelStatus.IN_PROGRESS.name()));
   private final Set<String> processingStatuses = new HashSet<>(Arrays
-      .asList(TravelStatusEnum.CREATED.name(), TravelStatusEnum.PROCESSING.name()));
+      .asList(TravelStatus.CREATED.name(), TravelStatus.PROCESSING.name()));
 
   public TravelEntity createTravel(TravelDto travelDto) {
     if (!checkTravelDto(travelDto)) {
@@ -41,17 +43,21 @@ public class TravelService {
     if (travelEntity != null) {
       throw new AlreadyExistException("У пользователя уже имеется активная поездка");
     }
-    var lastTravelEntity = travelRepository.getTravelEntityWithMaxId().orElse(null);
-    Long travelId = 0L;
-    if (lastTravelEntity == null) {
-      travelId = 1L;
-    } else {
-      travelId = lastTravelEntity.getId() + 1L;
-    }
-    travelEntity = new TravelEntity(travelId, travelDto.getAuthor(),
-        travelDto.getPlaceFrom(), travelDto.getPlaceTo(),
-        travelDto.getCountOfParticipants(), TravelStatusEnum.CREATED.name(),
-        travelDto.getComment());
+//    var lastTravelEntity = travelRepository.getTravelEntityWithMaxId().orElse(null);
+//    Long travelId = 0L;
+//    if (lastTravelEntity == null) {
+//      travelId = 1L;
+//    } else {
+//      travelId = lastTravelEntity.getId() + 1L;
+//    }
+    travelEntity = TravelEntity.builder()
+        .author(travelDto.getAuthor())
+        .placeFrom(travelDto.getPlaceFrom())
+        .placeTo(travelDto.getPlaceTo())
+        .countOfParticipants(travelDto.getCountOfParticipants())
+        .travelStatus(TravelStatus.CREATED.name())
+        .comment(travelDto.getComment())
+        .build();
     try {
       travelRepository.save(travelEntity);
       return travelEntity;
@@ -62,9 +68,8 @@ public class TravelService {
     }
   }
 
-  public List<TravelEntity> getAllOpenTravels() {
-    return travelRepository.getAllByTravelStatusIn(processingStatuses)
-        .orElse(Collections.emptyList());
+  public Page<TravelEntity> getAllOpenTravels(Pageable request) {
+    return travelRepository.getAllByTravelStatusIn(processingStatuses, request);
   }
 
   private boolean checkTravelDto(TravelDto travelDto) {

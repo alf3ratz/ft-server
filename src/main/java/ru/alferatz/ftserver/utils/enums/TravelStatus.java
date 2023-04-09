@@ -1,6 +1,6 @@
 package ru.alferatz.ftserver.utils.enums;
 
-public enum TravelStatusEnum {
+public enum TravelStatus {
     CREATED,
     PROCESSING,
     IN_PROGRESS,

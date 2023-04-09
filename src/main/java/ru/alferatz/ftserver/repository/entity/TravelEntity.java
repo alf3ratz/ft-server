@@ -1,6 +1,8 @@
 package ru.alferatz.ftserver.repository.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import lombok.*;
 import ru.alferatz.ftserver.model.UserDto;
 
@@ -19,24 +21,18 @@ import java.io.Serializable;
 public class TravelEntity {
 
   @Id
-  @Builder.Default
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id = 0L;
 
-  @Builder.Default
   private String author = "";
 
-  @Builder.Default
   private String placeFrom = "";
 
-  @Builder.Default
   private String placeTo = "";
 
-  @Builder.Default
   private Integer countOfParticipants = 0;
 
-  @Builder.Default
   private String travelStatus = "";
 
-  @Builder.Default
   private String comment = "";
 }

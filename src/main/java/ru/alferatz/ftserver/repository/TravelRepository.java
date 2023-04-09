@@ -1,9 +1,10 @@
 package ru.alferatz.ftserver.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ru.alferatz.ftserver.repository.entity.TravelEntity;
-import ru.alferatz.ftserver.utils.enums.TravelStatusEnum;
 
 import java.util.Collection;
 import java.util.List;
@@ -16,7 +17,7 @@ public interface TravelRepository extends JpaRepository<TravelEntity, Long> {
   Optional<TravelEntity> getTravelEntityByAuthorAndTravelStatusIn(String author,
       Collection<String> travelStatuses);
 
-  Optional<List<TravelEntity>> getAllByTravelStatusIn(Collection<String> travelStatuses);
+  Page<TravelEntity> getAllByTravelStatusIn(Collection<String> travelStatuses, Pageable request);
 
   Optional<TravelEntity> getTravelEntitiesByAuthor(String author);
 
