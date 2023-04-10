@@ -7,11 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
-import ru.alferatz.ftserver.model.TravelDto;
-import ru.alferatz.ftserver.repository.TravelRepository;
-import ru.alferatz.ftserver.repository.entity.TravelEntity;
-import ru.alferatz.ftserver.service.TravelService;
-import ru.alferatz.ftserver.utils.enums.TravelStatus;
+import ru.alferatz.travels.model.TravelDto;
+import ru.alferatz.travels.repository.TravelRepository;
+import ru.alferatz.travels.repository.entity.TravelEntity;
+import ru.alferatz.travels.service.TravelService;
+import ru.alferatz.travels.utils.enums.TravelStatus;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
