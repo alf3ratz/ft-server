@@ -1,4 +1,4 @@
-package ru.alferatz.ftserver;
+package ru.alferatz.travels;
 
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
