@@ -7,3 +7,6 @@ spring:
     url: jdbc:postgresql://ec2-54-80-122-11.compute-1.amazonaws.com:5432/d2duq9ekdqf40t
     username: njhcjjhszaojaq
     password: 66a1175a8f4e85e5a8f2e347a3f4596c52e8792920d9d986c43171f5aa0db70b
+  liquibase:
+    change-log: classpath:/db/changelog/changelog-master.xml
+

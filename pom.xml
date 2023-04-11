@@ -16,6 +16,8 @@
   <name>ft-server</name>
   <modules>
     <module>auth</module>
+    <module>travels</module>
+    <module>deployment</module>
   </modules>
   <properties>
     <java.version>17</java.version>
@@ -48,7 +50,7 @@
     <dependency>
       <groupId>org.springdoc</groupId>
       <artifactId>springdoc-openapi-ui</artifactId>
-      <version>1.6.13</version>
+      <version>1.7.0</version>
     </dependency>
     <dependency>
       <groupId>org.postgresql</groupId>

@@ -1,5 +1,9 @@
 package ru.alferatz.travels.repository.entity;
 
+import java.util.HashSet;
+import java.util.Set;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import lombok.*;
 
 import javax.persistence.Entity;
@@ -26,4 +30,9 @@ public class UserEntity {
 
     @Builder.Default
     private Long travelId = 0l;
+
+
+    @OneToMany(mappedBy = "user")
+    @JoinColumn(name="tokens")
+    private Set tokens;
 }
