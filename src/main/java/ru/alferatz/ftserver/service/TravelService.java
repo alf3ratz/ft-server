@@ -1,6 +1,7 @@
 package ru.alferatz.ftserver.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,10 +11,13 @@ import ru.alferatz.ftserver.exceptions.AlreadyExistException;
 import ru.alferatz.ftserver.exceptions.BadRequestException;
 import ru.alferatz.ftserver.exceptions.InternalServerError;
 import ru.alferatz.ftserver.exceptions.NotFoundException;
+import ru.alferatz.ftserver.model.ConnectToTravelRequest;
 import ru.alferatz.ftserver.model.TravelDto;
+import ru.alferatz.ftserver.model.UserDto;
 import ru.alferatz.ftserver.repository.TravelRepository;
 import ru.alferatz.ftserver.repository.UserRepository;
 import ru.alferatz.ftserver.repository.entity.TravelEntity;
+import ru.alferatz.ftserver.repository.entity.UserEntity;
 import ru.alferatz.ftserver.utils.enums.TravelStatus;
 
 import java.util.*;
@@ -83,7 +87,49 @@ public class TravelService {
     }
   }
 
-  public TravelEntity addParticipant(TravelDto travelDto) {
+  public Pair<TravelEntity, List<UserDto>> addParticipant(ConnectToTravelRequest request) {
+    if (request.getTravelId() == null || request.getEmail().isEmpty()) {
+      throw new BadRequestException("Неверный запрос");
+    }
+    TravelEntity travelEntity = travelRepository.findById(request.getTravelId()).orElse(null);
+    if (travelEntity == null) {
+      throw new NotFoundException("Поездка не была найдена");
+    }
+    linkParticipantToTravel(request.getEmail(), travelEntity.getId());
+    List<UserDto> userDtoList = getUserDtoListFromUserEntityList(travelEntity.getId());
+    travelEntity.setCountOfParticipants(travelEntity.getCountOfParticipants() + 1);
+    try {
+      travelRepository.save(travelEntity);
+      return Pair.of(travelEntity, userDtoList);
+    } catch (RuntimeException ex) {
+      throw new InternalServerError("Не удалось обновить поездку в базе");
+    } finally {
+      travelRepository.flush();
+    }
+  }
+
+  public Pair<TravelEntity, List<UserDto>> reduceParticipant(ConnectToTravelRequest request) {
+    if (request.getTravelId() == null || request.getEmail().isEmpty()) {
+      throw new BadRequestException("Неверный запрос");
+    }
+    TravelEntity travelEntity = travelRepository.findById(request.getTravelId()).orElse(null);
+    if (travelEntity == null) {
+      throw new NotFoundException("Поездка не была найдена");
+    }
+    unlinkParticipantToTravel(request.getEmail(), travelEntity.getId());
+    List<UserDto> userDtoList = getUserDtoListFromUserEntityList(travelEntity.getId());
+    travelEntity.setCountOfParticipants(travelEntity.getCountOfParticipants() + 1);
+    try {
+      travelRepository.save(travelEntity);
+      return Pair.of(travelEntity, userDtoList);
+    } catch (RuntimeException ex) {
+      throw new InternalServerError("Не удалось обновить поездку в базе");
+    } finally {
+      travelRepository.flush();
+    }
+  }
+
+  public TravelEntity addParticipantOld(TravelDto travelDto) {
     TravelEntity travelEntity = checkTravel(travelDto);
     if (isTravelChanged(travelEntity, travelDto)) {
       var usersAtTravelBeforeReduce = userRepository.getAllByTravelId(travelEntity.getId())
@@ -113,7 +159,7 @@ public class TravelService {
     return travelEntity;
   }
 
-  public TravelEntity reduceParticipant(TravelDto travelDto) {
+  public TravelEntity reduceParticipantOld(TravelDto travelDto) {
     TravelEntity travelEntity = checkTravel(travelDto);
     if (isTravelChanged(travelEntity, travelDto)) {
       var usersAtTravelBeforeReduce = userRepository.getAllByTravelId(travelEntity.getId())
@@ -143,9 +189,17 @@ public class TravelService {
     return travelEntity;
   }
 
-  public TravelEntity updateTravel(TravelDto travelDto) {
+  private List<UserDto> getUserDtoListFromUserEntityList(Long travelId) {
+    List<UserDto> userDtoList = new ArrayList<>();
+    List<UserEntity> usersInTravel = userRepository.getAllByTravelId(travelId)
+        .orElse(Collections.emptyList());
+    usersInTravel.forEach(i -> userDtoList.add(new UserDto(i.getUsername(), i.getEmail())));
+    return userDtoList;
+  }
+
+  public Pair<TravelEntity, List<UserDto>> updateTravel(TravelDto travelDto) {
     TravelEntity travelEntity = checkTravel(travelDto);
-    //var travelEntityFromDto = conversionService.convert(travelDto, TravelEntity.class);
+    List<UserDto> userDtoList = getUserDtoListFromUserEntityList(travelEntity.getId());
     if (isTravelChanged(travelEntity, travelDto)) {
       travelEntity.setCountOfParticipants(travelDto.getCountOfParticipants());
       // TODO: подумать, как обновлять участников без полного цикла for (может быть лишняя работа)
@@ -155,14 +209,26 @@ public class TravelService {
       travelEntity.setComment(travelDto.getComment());
       try {
         travelRepository.save(travelEntity);
-        return travelEntity;
+        return Pair.of(travelEntity, userDtoList);
       } catch (RuntimeException ex) {
         throw new InternalServerError("Не удалось обновить поездку в базе");
       } finally {
         travelRepository.flush();
       }
     }
-    return travelEntity;
+    return Pair.of(travelEntity, userDtoList);
+  }
+
+  public Pair<TravelEntity, List<UserDto>> getTravelById(Long travelId) {
+    if (travelId <= 0) {
+      throw new BadRequestException("Неверный travelId");
+    }
+    TravelEntity travelEntity = travelRepository.findById(travelId).orElse(null);
+    if (travelEntity == null) {
+      throw new NotFoundException("Запрашиваемой поездки не существует");
+    }
+    List<UserDto> userDtoList = getUserDtoListFromUserEntityList(travelEntity.getId());
+    return Pair.of(travelEntity, userDtoList);
   }
 
   /**
@@ -214,16 +280,22 @@ public class TravelService {
     userRepository.saveAndFlush(user);
   }
 
-  public Integer deleteTravel(TravelDto travelDto) {
-    if (!checkTravelDto(travelDto)) {
+  public Integer deleteTravel(Long travelId) {
+    if (travelId <= 0) {
       throw new BadRequestException("Wrong parameter value");
     }
-    var deletedTravelCount = travelRepository.deleteTravelEntityByAuthor(travelDto.getAuthor());
-    if (deletedTravelCount == 0) {
-      throw new NotFoundException("Can not delete travel");
+
+    try {
+      var deletedTravelCount = travelRepository.deleteTravelEntityById(travelId);
+      if (deletedTravelCount == 0) {
+        throw new NotFoundException("Can not delete travel");
+      }
+      return deletedTravelCount;
+    } catch (RuntimeException e) {
+      throw new InternalServerError("Не удалось удалить поездку");
+    } finally {
+      travelRepository.flush();
     }
-    travelRepository.flush();
-    return deletedTravelCount;
   }
 
 
