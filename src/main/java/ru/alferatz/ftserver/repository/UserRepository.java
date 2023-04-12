@@ -8,7 +8,7 @@ import ru.alferatz.ftserver.repository.entity.UserEntity;
 
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
-  UserEntity getUserEntityByEmail(String userEmail);
+  Optional<UserEntity> getUserEntityByEmail(String userEmail);
 
   @Query(value = "update u from user_jn u " +
       "set u.travel_id = :travelId" +

@@ -203,13 +203,21 @@ public class TravelService {
   }
 
   private void linkParticipantToTravel(String participantEmail, Long travelId) {
-    var user = userRepository.getUserEntityByEmail(participantEmail);
+    var user = userRepository.getUserEntityByEmail(participantEmail).orElse(null);
+    if (user == null) {
+      throw new InternalServerError(
+          "Не удалось добавить пользователя в поездку из-за отсутствия пользователя в базе");
+    }
     user.setTravelId(travelId);
     userRepository.saveAndFlush(user);
   }
 
   private void unlinkParticipantToTravel(String participantEmail, Long travelId) {
-    var user = userRepository.getUserEntityByEmail(participantEmail);
+    var user = userRepository.getUserEntityByEmail(participantEmail).orElse(null);
+    if (user == null) {
+      throw new InternalServerError(
+          "Не удалось удалить пользователя из поездки из-за отсутствия пользователя в базе");
+    }
     user.setTravelId(null);
     userRepository.saveAndFlush(user);
   }

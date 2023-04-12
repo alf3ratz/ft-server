@@ -1,5 +1,7 @@
 package ru.alferatz.ftserver.repository.entity;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import lombok.*;
 
 import javax.persistence.Entity;
@@ -15,15 +17,12 @@ import javax.persistence.Table;
 @Table(name = "user_jn")
 public class UserEntity {
     @Id
-    @Builder.Default
-    private Integer id = 0;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id = 0L;
 
-    @Builder.Default
     private String username = "";
 
-    @Builder.Default
     private String email = "";
 
-    @Builder.Default
-    private Long travelId = 0l;
+    private Long travelId = null;
 }

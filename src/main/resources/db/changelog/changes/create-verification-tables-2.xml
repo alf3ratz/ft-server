@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+  <changeSet author="admin" id="2">
+    <createTable tableName="verification_token_jn">
+      <column autoIncrement="true" name="id" type="BIGINT">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="token" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="user_id" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="expiry_date" type="TIMESTAMP">
+        <constraints nullable="true"/>
+      </column>
+    </createTable>
+    <addForeignKeyConstraint baseColumnNames="user_id"
+      baseTableName="verification_token_jn"
+      constraintName="fk_user_id"
+      referencedColumnNames="id"
+      referencedTableName="user_jn"/>
+<!--    <addForeignKeyConstraint baseColumnNames="travel_id"-->
+<!--      baseTableName="user_jn"-->
+<!--      constraintName="fk_travel_id"-->
+<!--      referencedColumnNames="id"-->
+<!--      referencedTableName="travel_jn"/>-->
+  </changeSet>
+</databaseChangeLog>
