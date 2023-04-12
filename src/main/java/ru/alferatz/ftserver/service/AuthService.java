@@ -57,13 +57,13 @@ public class AuthService {
     String recipientAddress = userEntity.getEmail();
     String subject = "Registration Confirmation";
     String confirmationUrl
-        = "http://localhost:8080" + "/loginConfirm?token=" + token;
+        = "/loginConfirm?token=" + token;
     //String message = messages.getMessage("message.regSucc", null, Locale.ENGLISH);
 
     SimpleMailMessage email = new SimpleMailMessage();
     email.setTo(recipientAddress);
     email.setSubject(subject);
-    email.setText("blabla" + "\r\n" + "http://localhost:8080" + confirmationUrl);
+    email.setText("blabla" + "\r\n" + "https://ftapp.herokuapp.com" + confirmationUrl);
     try {
       mailSender.send(email);
       return userEntity;
