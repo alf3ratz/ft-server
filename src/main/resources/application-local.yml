@@ -1,0 +1,19 @@
+server:
+  port:8080
+spring:
+  rabbitmq:
+    host: localhost
+    username: guest
+    password: quest
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/ftapp
+    username: ftapp
+    password: ftapp
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true

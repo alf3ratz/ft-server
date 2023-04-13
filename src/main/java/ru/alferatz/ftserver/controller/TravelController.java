@@ -107,10 +107,7 @@ public class TravelController {
 
   @PostMapping("/deleteTravel")
   public Integer deleteTravel(@RequestParam Long travelId) {
-    //var deletedTravelEntity =
     return travelService.deleteTravel(travelId);
-    //return conversionService.convert(deletedTravelEntity, TravelDto.class);
-    //return TravelDto.builder().author(new UserDto()).build();
   }
 
   @GetMapping("/getTravelById")

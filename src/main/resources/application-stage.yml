@@ -1,5 +1,4 @@
 server:
-  hos
   port:8080
 spring:
   datasource:
