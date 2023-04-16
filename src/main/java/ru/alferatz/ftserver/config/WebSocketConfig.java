@@ -48,8 +48,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 //        .setSystemPasscode(password);
 //  }
 
-  //  @Value("${spring.rabbitmq.host}")
-//  String host;
+  @Value("${spring.rabbitmq.host}")
+  String host;
   @Value("${spring.rabbitmq.virtual-host}")
   String virtualHost;
 
@@ -71,15 +71,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
   @Override
   public void configureMessageBroker(MessageBrokerRegistry config) {
     config.enableStompBrokerRelay(TOPIC_DESTINATION_PREFIX)
-        .setRelayHost("hawk.rmq.cloudamqp.com")
+        .setRelayHost(host)
         .setClientLogin(username)
         .setClientPasscode(password)
         .setSystemLogin(username)
         .setSystemPasscode(password);
     if (!virtualHost.isBlank() || !virtualHost.isEmpty()) {
       config.enableStompBrokerRelay(TOPIC_DESTINATION_PREFIX)
-          .setVirtualHost(virtualHost)
-          .setRelayHost("localhost");
+          .setVirtualHost(virtualHost);
     }
   }
 }
