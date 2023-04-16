@@ -1,8 +1,10 @@
 package ru.alferatz.ftserver.controller;
 
+import java.util.List;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.alferatz.ftserver.model.ConnectToTravelRequest;
 import ru.alferatz.ftserver.model.TravelDto;
+import ru.alferatz.ftserver.model.UserDto;
 import ru.alferatz.ftserver.repository.entity.TravelEntity;
 import ru.alferatz.ftserver.service.TravelService;
 
@@ -40,6 +43,8 @@ public class TravelController {
     //return conversionService.convert(newTravelEntity, TravelDto.class);
     return TravelDto.builder()
         .author(newTravelEntity.getAuthor())
+        .createTime(newTravelEntity.getCreateTime())
+        .startTime(newTravelEntity.getStartTime())
         .countOfParticipants(newTravelEntity.getCountOfParticipants())
         .placeFrom(newTravelEntity.getPlaceFrom())
         .placeTo(newTravelEntity.getPlaceTo())
@@ -49,15 +54,7 @@ public class TravelController {
   @PostMapping("/updateTravel")
   public TravelDto updateTravel(@RequestBody TravelDto travelDto) {
     var resultPair = travelService.updateTravel(travelDto);
-    var updatedTravelEntity = resultPair.getLeft();
-    var userList = resultPair.getRight();
-    return TravelDto.builder()
-        .author(updatedTravelEntity.getAuthor())
-        .countOfParticipants(updatedTravelEntity.getCountOfParticipants())
-        .placeFrom(updatedTravelEntity.getPlaceFrom())
-        .placeTo(updatedTravelEntity.getPlaceTo())
-        .participants(userList)
-        .build();
+    return buildTravelDto(resultPair);
 //    return conversionService.convert(updatedTravelEntity, TravelDto.class);
   }
 
@@ -65,29 +62,13 @@ public class TravelController {
   @PostMapping("/addTraveller")
   public TravelDto addParticipantToTravel(@RequestBody ConnectToTravelRequest request) {
     var resultPair = travelService.addParticipant(request);
-    var updatedTravelEntity = resultPair.getLeft();
-    var userList = resultPair.getRight();
-    return TravelDto.builder()
-        .author(updatedTravelEntity.getAuthor())
-        .countOfParticipants(updatedTravelEntity.getCountOfParticipants())
-        .placeFrom(updatedTravelEntity.getPlaceFrom())
-        .placeTo(updatedTravelEntity.getPlaceTo())
-        .participants(userList)
-        .build();
+    return buildTravelDto(resultPair);
   }
 
   @PostMapping("/reduceTravaller")
   public TravelDto reduceParticipantFromTravel(@RequestBody ConnectToTravelRequest request) {
     var resultPair = travelService.reduceParticipant(request);
-    var updatedTravelEntity = resultPair.getLeft();
-    var userList = resultPair.getRight();
-    return TravelDto.builder()
-        .author(updatedTravelEntity.getAuthor())
-        .countOfParticipants(updatedTravelEntity.getCountOfParticipants())
-        .placeFrom(updatedTravelEntity.getPlaceFrom())
-        .placeTo(updatedTravelEntity.getPlaceTo())
-        .participants(userList)
-        .build();
+    return buildTravelDto(resultPair);
   }
 
   @Deprecated
@@ -116,10 +97,22 @@ public class TravelController {
   @GetMapping("/getTravelById")
   public TravelDto getTravelById(@RequestParam(value = "travelId") Long travelId) {
     var resultPair = travelService.getTravelById(travelId);
+    return buildTravelDto(resultPair);
+  }
+
+  @GetMapping("/getTravelByUserEmail")
+  public TravelDto getTravelById(@RequestParam(value = "userEmail") String email) {
+    var resultPair = travelService.getTravelByUserEmail(email);
+    return buildTravelDto(resultPair);
+  }
+
+  private TravelDto buildTravelDto(Pair<TravelEntity, List<UserDto>> resultPair) {
     TravelEntity travelEntity = resultPair.getLeft();
     var userList = resultPair.getRight();
     return TravelDto.builder()
         .author(travelEntity.getAuthor())
+        .createTime(travelEntity.getCreateTime())
+        .startTime(travelEntity.getStartTime())
         .countOfParticipants(travelEntity.getCountOfParticipants())
         .placeFrom(travelEntity.getPlaceFrom())
         .placeTo(travelEntity.getPlaceTo())

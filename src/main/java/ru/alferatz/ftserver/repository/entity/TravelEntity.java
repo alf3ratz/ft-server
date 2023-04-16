@@ -1,6 +1,7 @@
 package ru.alferatz.ftserver.repository.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.time.LocalDateTime;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import lombok.*;
@@ -22,17 +23,23 @@ public class TravelEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id = 0L;
+  private Long id;
 
-  private String author = "";
+  private String author;
 
-  private String placeFrom = "";
+  @JsonProperty("createTime")
+  private LocalDateTime createTime;
 
-  private String placeTo = "";
+  @JsonProperty("startTime")
+  private LocalDateTime startTime;
 
-  private Integer countOfParticipants = 0;
+  private String placeFrom;
 
-  private String travelStatus = "";
+  private String placeTo;
+
+  private Integer countOfParticipants;
+
+  private String travelStatus;
 
   private String comment = "";
 }

@@ -1,5 +1,6 @@
 package ru.alferatz.ftserver.service;
 
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.core.convert.ConversionService;
@@ -56,6 +57,8 @@ public class TravelService {
 //    }
     travelEntity = TravelEntity.builder()
         .author(travelDto.getAuthor())
+        .createTime(LocalDateTime.now())
+        .startTime(travelDto.getStartTime())
         .placeFrom(travelDto.getPlaceFrom())
         .placeTo(travelDto.getPlaceTo())
         .countOfParticipants(travelDto.getCountOfParticipants())
@@ -81,7 +84,8 @@ public class TravelService {
       return !travelDto.getPlaceFrom().isEmpty() && !Objects.isNull(travelDto.getPlaceFrom()) &&
           !travelDto.getPlaceTo().isEmpty() && !Objects.isNull(travelDto.getPlaceTo()) &&
           travelDto.getCountOfParticipants() >= 0 && travelDto.getCountOfParticipants() <= 4 &&
-          !travelDto.getAuthor().isEmpty();
+          !travelDto.getAuthor().isEmpty() || travelDto.getStartTime()
+          .isBefore(LocalDateTime.now());
     } catch (RuntimeException ex) {
       throw new BadRequestException("Wrong parameter value");
     }
@@ -231,6 +235,23 @@ public class TravelService {
     return Pair.of(travelEntity, userDtoList);
   }
 
+  public Pair<TravelEntity, List<UserDto>> getTravelByUserEmail(String email) {
+    email = email.trim();
+    UserEntity user = userRepository.getUserEntityByEmail(email).orElse(null);
+    if (user == null) {
+      throw new NotFoundException("Пользователь не был найден в системе");
+    }
+    if (user.getTravelId() == null) {
+      throw new NotFoundException("Пользователь не находится в поездке");
+    }
+    TravelEntity travelEntity = travelRepository.findById(user.getTravelId()).orElse(null);
+    if (travelEntity == null) {
+      throw new NotFoundException("Поездка не найдена в системе");
+    }
+    List<UserDto> userDtoList = getUserDtoListFromUserEntityList(travelEntity.getId());
+    return Pair.of(travelEntity, userDtoList);
+  }
+
   /**
    * Проверяем, правильный ли объект пришел и есть ли поездка в базе
    *
@@ -269,13 +290,19 @@ public class TravelService {
   }
 
   private void linkParticipantToTravel(String participantEmail, Long travelId) {
-    var user = userRepository.getUserEntityByEmail(participantEmail);
+    var user = userRepository.getUserEntityByEmail(participantEmail).orElse(null);
+    if (user == null) {
+      throw new NotFoundException("Пользователь не был найден в системе");
+    }
     user.setTravelId(travelId);
     userRepository.saveAndFlush(user);
   }
 
   private void unlinkParticipantToTravel(String participantEmail, Long travelId) {
-    var user = userRepository.getUserEntityByEmail(participantEmail);
+    var user = userRepository.getUserEntityByEmail(participantEmail).orElse(null);
+    if (user == null) {
+      throw new NotFoundException("Пользователь не был найден в системе");
+    }
     user.setTravelId(null);
     userRepository.saveAndFlush(user);
   }
