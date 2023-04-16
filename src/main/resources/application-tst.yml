@@ -3,8 +3,10 @@ server:
 spring:
   rabbitmq:
     host: localhost
-    username: guest
-    password: quest
+    username: test
+    password: test
+    port: 5672
+    addresses: spring.rabbitmq.addresses=amqp://test:test@localhost
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/ftapp
