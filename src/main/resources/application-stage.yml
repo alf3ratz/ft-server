@@ -3,11 +3,11 @@ server:
 spring:
   rabbitmq:
     addresses: amqps://akbmsmvn:p7LrnyoGTK_pQ607Gj68T_Bu-VTCd8_B@toad.rmq.cloudamqp.com/akbmsmvn
-    host: toad.rmq.cloudamqp.com
-    username: akbmsmvn
-    password: p7LrnyoGTK_pQ607Gj68T_Bu-VTCd8_B
+    host: hawk.rmq.cloudamqp.com #toad.rmq.cloudamqp.com
+    username: mhqvzuzz
+    password: 6J3t9AcnZCUDByBEsx2hduU4dm-C395n
     port: 5672
-    virtual-host: akbmsmvn
+    virtual-host: mhqvzuzz
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://ec2-54-80-122-11.compute-1.amazonaws.com:5432/d2duq9ekdqf40t

@@ -72,10 +72,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
   public void configureMessageBroker(MessageBrokerRegistry config) {
     config.enableStompBrokerRelay(TOPIC_DESTINATION_PREFIX)
         .setRelayHost(host)
-        .setVirtualHost(virtualHost)
         .setClientLogin(username)
         .setClientPasscode(password)
         .setSystemLogin(username)
         .setSystemPasscode(password);
+    if (!virtualHost.isBlank() || !virtualHost.isEmpty()) {
+      config.enableStompBrokerRelay(TOPIC_DESTINATION_PREFIX)
+          .setVirtualHost(virtualHost);
+    }
   }
 }

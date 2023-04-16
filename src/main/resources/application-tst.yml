@@ -7,6 +7,7 @@ spring:
     password: test
     port: 5672
     addresses: amqp://test:test@localhost
+    virtual-host:
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/ftapp
