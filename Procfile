@@ -1,0 +1,1 @@
+web: java -Dserver.port=$PORT $JAVA_OPTS -jar build/libs/*.jar -Dspring.config.location=file:${home}/src/main/resources/application-stage.yml

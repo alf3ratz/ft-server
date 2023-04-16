@@ -8,7 +8,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @EnableWebMvc
 @SpringBootApplication
-@PropertySources({@PropertySource(value = {"file:${application.properties}"})})
 public class FtServerApplication {
 
   public static void main(String[] args) {
