@@ -1,6 +1,7 @@
 package ru.alferatz.ftserver.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.time.LocalDateTime;
 import lombok.*;
 
 import java.util.List;
@@ -17,6 +18,12 @@ public class TravelDto {
 
   @JsonProperty("email")
   private String email;
+
+  @JsonProperty("createTime")
+  private LocalDateTime createTime;
+
+  @JsonProperty("startTime")
+  private LocalDateTime startTime;
 
   @NonNull
   @JsonProperty("placeFrom")
