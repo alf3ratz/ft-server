@@ -37,7 +37,7 @@ public class ChatController {
   }
 
   @PostMapping(value = "api/createChat", produces = MediaType.APPLICATION_JSON_VALUE)
-  public void createChat(@RequestParam(value = "offset") String chatName) {
+  public void createChat(@RequestParam(value = "chatName") String chatName) {
     chatService.createChat(chatName);
   }
 }
