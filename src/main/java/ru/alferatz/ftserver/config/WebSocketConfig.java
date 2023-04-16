@@ -1,6 +1,5 @@
 package ru.alferatz.ftserver.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import lombok.*;
 //import lombok.extern.log4j.Log4j2;
@@ -51,6 +50,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
   @Value("${spring.rabbitmq.host}")
   String host;
+  @Value("${spring.rabbitmq.virtual-host}")
+  String virtualHost;
 
   @Value("${spring.rabbitmq.username}")
   String username;
@@ -71,6 +72,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
   public void configureMessageBroker(MessageBrokerRegistry config) {
     config.enableStompBrokerRelay(TOPIC_DESTINATION_PREFIX)
         .setRelayHost(host)
+        .setVirtualHost(virtualHost)
         .setClientLogin(username)
         .setClientPasscode(password)
         .setSystemLogin(username)

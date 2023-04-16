@@ -25,7 +25,7 @@ import ru.alferatz.ftserver.controller.chat.ws.ParticipantWsController;
 import ru.alferatz.ftserver.model.chat.Participant;
 import ru.alferatz.ftserver.model.factory.ParticipantDtoFactory;
 
-@Log4j2
+//@Log4j2
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Service
@@ -43,7 +43,7 @@ public class ParticipantService {
 
   public void handleJoinChat(String sessionId, String participantId, String chatId) {
 
-    log.info(String.format("Participant \"%s\" join in chat \"%s\".", sessionId, chatId));
+    //log.info(String.format("Participant \"%s\" join in chat \"%s\".", sessionId, chatId));
 
     Participant participant = Participant.builder()
         .sessionId(sessionId)
@@ -82,13 +82,13 @@ public class ParticipantService {
 
           String chatId = participant.getChatId();
 
-          log.info(
-              String.format(
-                  "Participant \"%s\" leave from \"%s\" chat.",
-                  participant.getSessionId(),
-                  chatId
-              )
-          );
+//          log.info(
+//              String.format(
+//                  "Participant \"%s\" leave from \"%s\" chat.",
+//                  participant.getSessionId(),
+//                  chatId
+//              )
+//          );
 
           String key = ParticipantKeyHelper.makeKey(chatId);
 

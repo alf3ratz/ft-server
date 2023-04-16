@@ -18,7 +18,7 @@ import ru.alferatz.ftserver.model.chat.ParticipantDto;
 import ru.alferatz.ftserver.model.factory.ParticipantDtoFactory;
 import ru.alferatz.ftserver.service.chat.ParticipantService;
 
-@Log4j2
+//@Log4j2
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RestController

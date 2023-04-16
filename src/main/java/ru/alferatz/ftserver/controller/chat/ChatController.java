@@ -16,7 +16,7 @@ import ru.alferatz.ftserver.model.chat.ChatDto;
 import ru.alferatz.ftserver.model.factory.ChatDtoFactory;
 import ru.alferatz.ftserver.service.chat.ChatService;
 
-@Log4j2
+//@Log4j2
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RestController

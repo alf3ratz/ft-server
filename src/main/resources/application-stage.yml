@@ -2,10 +2,12 @@ server:
   port:8080
 spring:
   rabbitmq:
-    host: toad-01.rmq.cloudamqp.com
+    addresses: amqps://akbmsmvn:p7LrnyoGTK_pQ607Gj68T_Bu-VTCd8_B@toad.rmq.cloudamqp.com/akbmsmvn
+    host: toad.rmq.cloudamqp.com
     username: akbmsmvn
     password: p7LrnyoGTK_pQ607Gj68T_Bu-VTCd8_B
     port: 5672
+    virtual-host: akbmsmvn
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://ec2-54-80-122-11.compute-1.amazonaws.com:5432/d2duq9ekdqf40t

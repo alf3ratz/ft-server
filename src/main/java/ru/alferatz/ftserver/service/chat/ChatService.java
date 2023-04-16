@@ -17,7 +17,7 @@ import ru.alferatz.ftserver.controller.chat.ws.ChatWsController;
 import ru.alferatz.ftserver.model.chat.Chat;
 import ru.alferatz.ftserver.model.factory.ChatDtoFactory;
 
-@Log4j2
+//@Log4j2
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Service
@@ -33,7 +33,7 @@ public class ChatService {
 
   public void createChat(String chatName) {
 
-    log.info(String.format("Chat \"%s\" created.", chatName));
+    //log.info(String.format("Chat \"%s\" created.", chatName));
 
     Chat chat = Chat.builder()
         .name(chatName)
@@ -54,7 +54,7 @@ public class ChatService {
         .findAny()
         .ifPresent(chat -> {
 
-          log.info(String.format("Chat \"%s\" deleted.", chat.getName()));
+          //log.info(String.format("Chat \"%s\" deleted.", chat.getName()));
 
           setOperations.remove(KEY, chat);
 
