@@ -1,1 +1,1 @@
-web: java -Dserver.port=$PORT $JAVA_OPTS -jar target/ft-server-0.0.1-SNAPSHOT.jar -Dspring.config.location=file:${home}/src/main/resources/application-stage.yml
+web: java -Dserver.port=$PORT $JAVA_OPTS -jar target/ft-server-0.0.1-SNAPSHOT.jar -Dspring.config.location=src/main/resources/application-stage.yml
