@@ -1,4 +1,4 @@
-package ru.alferatz.ftserver.model;
+package ru.alferatz.ftserver.requests;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,9 +11,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class JoinChatRequest {
-
-  private String sessionId;
-  private String particiapntId;
+public class SendMessageRequest {
   private String chatId;
+  private String message;
+  private String simpSessionId;
 }

@@ -1,4 +1,4 @@
-package ru.alferatz.ftserver.model;
+package ru.alferatz.ftserver.requests;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

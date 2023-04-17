@@ -60,6 +60,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
   String password;
 
   public static final String TOPIC_DESTINATION_PREFIX = "/topic/";
+  public static final String APPLICATION_DESTINATION_PREFIX = "/chat/";
   public static final String REGISTRY = "/ws";
 
   @Override
@@ -70,14 +71,17 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
   @Override
   public void configureMessageBroker(MessageBrokerRegistry config) {
-    config.enableStompBrokerRelay(TOPIC_DESTINATION_PREFIX)
+    config
+        .setApplicationDestinationPrefixes(APPLICATION_DESTINATION_PREFIX)
+        .enableStompBrokerRelay(TOPIC_DESTINATION_PREFIX)
         .setRelayHost(host)
         .setClientLogin(username)
         .setClientPasscode(password)
         .setSystemLogin(username)
         .setSystemPasscode(password);
     if (!virtualHost.isBlank() || !virtualHost.isEmpty()) {
-      config.enableStompBrokerRelay(TOPIC_DESTINATION_PREFIX)
+      config
+          .enableStompBrokerRelay(TOPIC_DESTINATION_PREFIX)
           .setVirtualHost(virtualHost);
     }
   }

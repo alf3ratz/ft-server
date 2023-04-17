@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.stereotype.Controller;
@@ -64,21 +65,8 @@ public class ChatWsController {
     );
   }
 
-  @MessageMapping(SEND_MESSAGE_TO_PARTICIPANT)
-  public void sendMessageToParticipant(
-      @DestinationVariable("chat_id") String chatId,
-      @DestinationVariable("participant_id") String participantId,
-      String message,
-      @Header String simpSessionId) {
-
-    sendMessage(
-        getFetchPersonalMessagesDestination(chatId, participantId),
-        simpSessionId,
-        message
-    );
-  }
-
   @SubscribeMapping(FETCH_MESSAGES)
+  @SendTo("/chat/messages")
   public MessageDto fetchMessages(@DestinationVariable("chat_id") String chatId) {
     return null;
   }

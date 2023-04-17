@@ -16,12 +16,15 @@ import java.util.stream.Stream;
 import ru.alferatz.ftserver.controller.chat.ws.ChatWsController;
 import ru.alferatz.ftserver.model.chat.Chat;
 import ru.alferatz.ftserver.model.factory.ChatDtoFactory;
+import ru.alferatz.ftserver.requests.SendMessageRequest;
 
 //@Log4j2
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Service
 public class ChatService {
+
+  ChatWsController chatWsController;
 
   ChatDtoFactory chatDtoFactory;
 
@@ -71,4 +74,10 @@ public class ChatService {
         .orElseGet(HashSet::new)
         .stream();
   }
+
+//  public void sendMessage(SendMessageRequest sendMessageRequest) {
+//    chatWsController.sendMessageToAll(sendMessageRequest.getChatId(),
+//        sendMessageRequest.getMessage(),
+//        sendMessageRequest.getSimpSessionId());
+//  }
 }

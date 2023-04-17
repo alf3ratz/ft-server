@@ -9,13 +9,12 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class MessageDto {
-
-  String from;
-
-  String message;
+  private String from;
+  private String type;
+  private String message;
+  private String sender;
 
   @Builder.Default
-  Instant createdAt = Instant.now();
+  private Instant createdAt = Instant.now();
 }

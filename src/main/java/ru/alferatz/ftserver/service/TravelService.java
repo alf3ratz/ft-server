@@ -12,7 +12,7 @@ import ru.alferatz.ftserver.exceptions.AlreadyExistException;
 import ru.alferatz.ftserver.exceptions.BadRequestException;
 import ru.alferatz.ftserver.exceptions.InternalServerError;
 import ru.alferatz.ftserver.exceptions.NotFoundException;
-import ru.alferatz.ftserver.model.ConnectToTravelRequest;
+import ru.alferatz.ftserver.requests.ConnectToTravelRequest;
 import ru.alferatz.ftserver.model.TravelDto;
 import ru.alferatz.ftserver.model.UserDto;
 import ru.alferatz.ftserver.repository.TravelRepository;
