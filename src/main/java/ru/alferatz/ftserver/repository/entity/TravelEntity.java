@@ -42,4 +42,6 @@ public class TravelEntity {
   private String travelStatus;
 
   private String comment = "";
+
+  private Long chatId;
 }

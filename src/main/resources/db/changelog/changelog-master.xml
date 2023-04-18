@@ -7,4 +7,5 @@
     http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
   <include file="/db/changelog/changes/create-initial-tables-1.xml"/>
   <include file="/db/changelog/changes/update-travel-table-2.xml"/>
+  <include file="/db/changelog/changes/create-chat-tables-3.xml"/>
 </databaseChangeLog>

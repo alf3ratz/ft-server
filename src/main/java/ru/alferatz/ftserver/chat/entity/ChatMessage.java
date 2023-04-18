@@ -1,12 +1,15 @@
-package ru.alferatz.ftserver.repository.entity;
-
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import lombok.*;
+package ru.alferatz.ftserver.chat.entity;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -14,23 +17,16 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "user_jn")
-public class UserEntity {
+@Table(name = "chat_message_jn")
+public class ChatMessage {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Builder.Default
-  private String username = "";
-
-  @Builder.Default
-  private String email = "";
-
-  @Builder.Default
-  private Long travelId = 0L;
+  private String sender;
 
   private Long chatId;
 
-
+  private String message;
 }

@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.alferatz.ftserver.chat.entity.ChatRoom;
+import ru.alferatz.ftserver.chat.repository.ChatRoomRepository;
 import ru.alferatz.ftserver.exceptions.AlreadyExistException;
 import ru.alferatz.ftserver.exceptions.BadRequestException;
 import ru.alferatz.ftserver.exceptions.InternalServerError;
@@ -32,12 +34,18 @@ public class TravelService {
   private final ConversionService conversionService;
   private final TravelRepository travelRepository;
   private final UserRepository userRepository;
+  private final ChatRoomRepository chatRoomRepository;
   private final Set<String> statusesExceptClosed = new HashSet<>(Arrays
       .asList(TravelStatus.CREATED.name(), TravelStatus.PROCESSING.name(),
           TravelStatus.IN_PROGRESS.name()));
   private final Set<String> processingStatuses = new HashSet<>(Arrays
       .asList(TravelStatus.CREATED.name(), TravelStatus.PROCESSING.name()));
 
+  /**
+   * Создание объявления
+   *
+   * @param travelDto - объект с информацией об объявлении
+   */
   public TravelEntity createTravel(TravelDto travelDto) {
     if (!checkTravelDto(travelDto)) {
       throw new BadRequestException("Wrong parameter value");
@@ -48,13 +56,21 @@ public class TravelService {
     if (travelEntity != null) {
       throw new AlreadyExistException("У пользователя уже имеется активная поездка");
     }
-//    var lastTravelEntity = travelRepository.getTravelEntityWithMaxId().orElse(null);
-//    Long travelId = 0L;
-//    if (lastTravelEntity == null) {
-//      travelId = 1L;
-//    } else {
-//      travelId = lastTravelEntity.getId() + 1L;
-//    }
+    // Создали чат, в котором потому будут общаться попутчики
+    ChatRoom newChatRoom = ChatRoom.builder()
+        .author(travelDto.getAuthor())
+        .build();
+    try {
+      chatRoomRepository.save(newChatRoom);
+    } catch (RuntimeException ex) {
+      throw new InternalServerError("Не удалось создать чат во время создания поездки");
+    } finally {
+      chatRoomRepository.flush();
+    }
+    // Присоединили создателя поездки к чату
+    linkParticipantToChat(travelDto.getAuthor(), newChatRoom.getId());
+
+    // Создали объявление, которое сохранится в базе
     travelEntity = TravelEntity.builder()
         .author(travelDto.getAuthor())
         .createTime(LocalDateTime.now())
@@ -64,14 +80,22 @@ public class TravelService {
         .countOfParticipants(travelDto.getCountOfParticipants())
         .travelStatus(TravelStatus.CREATED.name())
         .comment(travelDto.getComment())
+        .chatId(newChatRoom.getId())
         .build();
+    var user = userRepository.getUserEntityByEmail(travelDto.getEmail()).orElse(null);
+    if (user == null) {
+      throw new NotFoundException("Пользователя, создающего поездку, нет в базе");
+    }
     try {
       travelRepository.save(travelEntity);
+      user.setTravelId(travelEntity.getId());
+      userRepository.save(user);
       return travelEntity;
     } catch (RuntimeException ex) {
       throw new InternalServerError("Не удалось добавить поездку в базу");
     } finally {
       travelRepository.flush();
+      userRepository.flush();
     }
   }
 
@@ -100,6 +124,9 @@ public class TravelService {
       throw new NotFoundException("Поездка не была найдена");
     }
     linkParticipantToTravel(request.getEmail(), travelEntity.getId());
+    // Присоединили попутчика к чату поездки
+    linkParticipantToChat(request.getEmail(), travelEntity.getChatId());
+
     List<UserDto> userDtoList = getUserDtoListFromUserEntityList(travelEntity.getId());
     travelEntity.setCountOfParticipants(travelEntity.getCountOfParticipants() + 1);
     try {
@@ -121,8 +148,11 @@ public class TravelService {
       throw new NotFoundException("Поездка не была найдена");
     }
     unlinkParticipantToTravel(request.getEmail(), travelEntity.getId());
+    // Удалили попутчика из чата поездки
+    unlinkParticipantFromChat(request.getEmail());
+
     List<UserDto> userDtoList = getUserDtoListFromUserEntityList(travelEntity.getId());
-    travelEntity.setCountOfParticipants(travelEntity.getCountOfParticipants() + 1);
+    travelEntity.setCountOfParticipants(travelEntity.getCountOfParticipants() - 1);
     try {
       travelRepository.save(travelEntity);
       return Pair.of(travelEntity, userDtoList);
@@ -307,11 +337,37 @@ public class TravelService {
     userRepository.saveAndFlush(user);
   }
 
+  private void linkParticipantToChat(String participantEmail, Long chatId) {
+    var user = userRepository.getUserEntityByEmail(participantEmail).orElse(null);
+    if (user == null) {
+      throw new NotFoundException("Пользователь не был найден в системе");
+    }
+    user.setChatId(chatId);
+    userRepository.saveAndFlush(user);
+  }
+
+  private void unlinkParticipantFromChat(String participantEmail) {
+    var user = userRepository.getUserEntityByEmail(participantEmail).orElse(null);
+    if (user == null) {
+      throw new NotFoundException("Пользователь не был найден в системе");
+    }
+    user.setChatId(null);
+    userRepository.saveAndFlush(user);
+  }
+
   public Integer deleteTravel(Long travelId) {
     if (travelId <= 0) {
       throw new BadRequestException("Wrong parameter value");
     }
-
+    var travelEntity = travelRepository.findById(travelId).orElse(null);
+    if (travelEntity == null) {
+      throw new NotFoundException("Поездки не существует");
+    }
+    var participants = userRepository.getAllByTravelId(travelId).orElseGet(Collections::emptyList);
+    participants.forEach(i -> {
+      unlinkParticipantFromChat(i.getEmail());
+      unlinkParticipantToTravel(i.getEmail(), travelEntity.getId());
+    });
     try {
       var deletedTravelCount = travelRepository.deleteTravelEntityById(travelId);
       if (deletedTravelCount == 0) {
