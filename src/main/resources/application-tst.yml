@@ -1,0 +1,36 @@
+server:
+  port: 8080
+app:
+  kafka:
+    producer:
+      topic: vtplynos-kafka-chat
+    consumer:
+      topic: vtplynos-kafka-chat
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/ftapp
+    username: ftapp
+    password: ftapp
+  kafka:
+    bootstrap-servers: moped.srvs.cloudkafka.com
+      properties:
+        #Server host name verification is disabled by setting ssl.endpoint.identification.algorithm to an empty string
+        ssl.endpoint.identification.algorithm: SASL
+#      ssl:
+#        protocol: SSL
+#        trust-store-location: classpath:/app/store/truststore.jks
+#        trust-store-password: <TURST_STORE_PASSWORD>
+#        key-store-location: classpath:/app/store/keystore.jks
+#        key-store-password: <KEY_STORE_PASSWORD>
+#        key-password: <KEY_PASSWORD>
+      producer:
+        retries: 0
+        acks: all
+        key-serializer: org.apache.kafka.common.serialization.StringSerializer
+        value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      consumer:
+        group-id: <CONSUMER_GROUP_ID>
+        auto-offset-reset: earliest
+        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
