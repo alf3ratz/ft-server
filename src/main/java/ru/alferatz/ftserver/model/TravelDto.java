@@ -41,4 +41,7 @@ public class TravelDto {
 
   @Builder.Default
   private String comment = "";
+  @Builder.Default
+  private Long chatId = 0L;
+
 }
