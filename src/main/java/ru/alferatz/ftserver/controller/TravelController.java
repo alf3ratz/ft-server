@@ -40,7 +40,6 @@ public class TravelController {
   @PostMapping("/createTravel")
   public TravelDto createTravel(@RequestBody TravelDto travelDto) {
     var newTravelEntity = travelService.createTravel(travelDto);
-    //return conversionService.convert(newTravelEntity, TravelDto.class);
     return TravelDto.builder()
         .author(newTravelEntity.getAuthor())
         .createTime(newTravelEntity.getCreateTime())
@@ -55,7 +54,6 @@ public class TravelController {
   public TravelDto updateTravel(@RequestBody TravelDto travelDto) {
     var resultPair = travelService.updateTravel(travelDto);
     return buildTravelDto(resultPair);
-//    return conversionService.convert(updatedTravelEntity, TravelDto.class);
   }
 
 
@@ -88,10 +86,7 @@ public class TravelController {
 
   @PostMapping("/deleteTravel")
   public Integer deleteTravel(@RequestParam Long travelId) {
-    //var deletedTravelEntity =
     return travelService.deleteTravel(travelId);
-    //return conversionService.convert(deletedTravelEntity, TravelDto.class);
-    //return TravelDto.builder().author(new UserDto()).build();
   }
 
   @GetMapping("/getTravelById")

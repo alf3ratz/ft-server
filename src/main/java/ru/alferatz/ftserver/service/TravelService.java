@@ -48,13 +48,6 @@ public class TravelService {
     if (travelEntity != null) {
       throw new AlreadyExistException("У пользователя уже имеется активная поездка");
     }
-//    var lastTravelEntity = travelRepository.getTravelEntityWithMaxId().orElse(null);
-//    Long travelId = 0L;
-//    if (lastTravelEntity == null) {
-//      travelId = 1L;
-//    } else {
-//      travelId = lastTravelEntity.getId() + 1L;
-//    }
     travelEntity = TravelEntity.builder()
         .author(travelDto.getAuthor())
         .createTime(LocalDateTime.now())
