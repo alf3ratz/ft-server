@@ -74,7 +74,7 @@ public class TravelService {
     travelEntity = TravelEntity.builder()
         .author(travelDto.getAuthorEmail())
         .createTime(LocalDateTime.now())
-        .startTime(travelDto.getStartTime())
+        .startTime(LocalDateTime.parse(travelDto.getStartTime()))
         .placeFrom(travelDto.getPlaceFrom())
         .placeTo(travelDto.getPlaceTo())
         .countOfParticipants(travelDto.getCountOfParticipants())
@@ -108,7 +108,7 @@ public class TravelService {
       return !travelDto.getPlaceFrom().isEmpty() && !Objects.isNull(travelDto.getPlaceFrom()) &&
           !travelDto.getPlaceTo().isEmpty() && !Objects.isNull(travelDto.getPlaceTo()) &&
           travelDto.getCountOfParticipants() >= 0 && travelDto.getCountOfParticipants() <= 4 &&
-          !travelDto.getAuthorEmail().isEmpty() || travelDto.getStartTime()
+          !travelDto.getAuthorEmail().isEmpty() || LocalDateTime.parse(travelDto.getStartTime())
           .isBefore(LocalDateTime.now());
     } catch (RuntimeException ex) {
       throw new BadRequestException("Wrong parameter value");

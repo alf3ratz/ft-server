@@ -15,9 +15,9 @@ public class TravelDto {
 
   private String authorEmail;
 
-  private LocalDateTime createTime;
+  private String createTime;
 
-  private LocalDateTime startTime;
+  private String startTime;
 
   private String placeFrom;
 
