@@ -1,13 +1,16 @@
 package ru.alferatz.ftserver.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.alferatz.ftserver.model.ConnectToTravelRequest;
 import ru.alferatz.ftserver.model.TravelDto;
+import ru.alferatz.ftserver.model.TravelDtoFactory;
 import ru.alferatz.ftserver.model.UserDto;
 import ru.alferatz.ftserver.repository.entity.TravelEntity;
 import ru.alferatz.ftserver.service.TravelService;
@@ -29,12 +33,22 @@ public class TravelController {
 
   private final TravelService travelService;
   private final ConversionService conversionService;
+  private final TravelDtoFactory travelDtoFactory;
 
   @GetMapping("/getAllTravels")
-  public Page<TravelEntity> getOpenTravels(
+  public Page<TravelDto> getOpenTravels(
       @RequestParam(value = "offset", defaultValue = "0") @Min(0) Integer offset,
       @RequestParam(value = "limit", defaultValue = "10") @Min(1) @Max(10) Integer limit) {
-    return travelService.getAllOpenTravels(PageRequest.of(offset, limit));
+
+    var openTravelsPair = travelService.getAllOpenTravels(PageRequest.of(offset, limit));
+    Page<TravelEntity> openTravels = openTravelsPair.getLeft();
+    var map = openTravelsPair.getRight();
+    var openTravelList = openTravels
+        .stream()
+        .map(i -> travelDtoFactory.makeTravelDto(i, map.get(i.getAuthor())))
+        .collect(Collectors.toList());
+    return new PageImpl<>(openTravelList);
+
   }
 
   @PostMapping("/createTravel")

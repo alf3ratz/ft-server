@@ -99,8 +99,14 @@ public class TravelService {
     }
   }
 
-  public Page<TravelEntity> getAllOpenTravels(Pageable request) {
-    return travelRepository.getAllByTravelStatusIn(processingStatuses, request);
+  public Pair<Page<TravelEntity>, Map<String, List<UserDto>>> getAllOpenTravels(Pageable request) {
+    Map<String, List<UserDto>> travelIdToUserListMap = new HashMap<>();
+    var openTravels = travelRepository.getAllByTravelStatusIn(processingStatuses, request);
+    openTravels.forEach(i -> {
+      travelIdToUserListMap.put(i.getAuthor(), getUserDtoListFromUserEntityList(i.getId()));
+    });
+    //getUserDtoListFromUserEntityList(travelEntity.getId());
+    return Pair.of(openTravels, travelIdToUserListMap);
   }
 
   private boolean checkTravelDto(TravelDto travelDto) {
