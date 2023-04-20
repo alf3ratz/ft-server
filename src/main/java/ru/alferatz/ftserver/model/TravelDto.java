@@ -12,12 +12,9 @@ import java.util.List;
 @Builder
 public class TravelDto {
 
-  @NonNull
-  @JsonProperty("author")
-  private String author;
 
   @JsonProperty("email")
-  private String email;
+  private String authorEmail;
 
   @JsonProperty("createTime")
   private LocalDateTime createTime;

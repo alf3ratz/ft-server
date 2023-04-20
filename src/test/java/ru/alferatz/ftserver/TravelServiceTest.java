@@ -49,7 +49,7 @@ class TravelServiceTest {
 
     // when
     TravelDto travelDto = TravelDto.builder()
-        .author(author)
+        .authorEmail(author)
         .countOfParticipants(1)
         .placeFrom("test_1")
         .placeTo("test_2")
