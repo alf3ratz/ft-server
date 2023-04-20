@@ -51,14 +51,14 @@ public class TravelService {
       throw new BadRequestException("Wrong parameter value");
     }
     TravelEntity travelEntity = travelRepository
-        .getTravelEntityByAuthorAndTravelStatusIn(travelDto.getAuthor(), statusesExceptClosed)
+        .getTravelEntityByAuthorAndTravelStatusIn(travelDto.getAuthorEmail(), statusesExceptClosed)
         .orElse(null);
     if (travelEntity != null) {
       throw new AlreadyExistException("У пользователя уже имеется активная поездка");
     }
     // Создали чат, в котором потому будут общаться попутчики
     ChatRoom newChatRoom = ChatRoom.builder()
-        .author(travelDto.getAuthor())
+        .author(travelDto.getAuthorEmail())
         .build();
     try {
       chatRoomRepository.save(newChatRoom);
@@ -68,11 +68,11 @@ public class TravelService {
       chatRoomRepository.flush();
     }
     // Присоединили создателя поездки к чату
-    linkParticipantToChat(travelDto.getAuthor(), newChatRoom.getId());
+    linkParticipantToChat(travelDto.getAuthorEmail(), newChatRoom.getId());
 
     // Создали объявление, которое сохранится в базе
     travelEntity = TravelEntity.builder()
-        .author(travelDto.getAuthor())
+        .author(travelDto.getAuthorEmail())
         .createTime(LocalDateTime.now())
         .startTime(travelDto.getStartTime())
         .placeFrom(travelDto.getPlaceFrom())
@@ -82,7 +82,7 @@ public class TravelService {
         .comment(travelDto.getComment())
         .chatId(newChatRoom.getId())
         .build();
-    var user = userRepository.getUserEntityByEmail(travelDto.getEmail()).orElse(null);
+    var user = userRepository.getUserEntityByEmail(travelDto.getAuthorEmail()).orElse(null);
     if (user == null) {
       throw new NotFoundException("Пользователя, создающего поездку, нет в базе");
     }
@@ -108,7 +108,7 @@ public class TravelService {
       return !travelDto.getPlaceFrom().isEmpty() && !Objects.isNull(travelDto.getPlaceFrom()) &&
           !travelDto.getPlaceTo().isEmpty() && !Objects.isNull(travelDto.getPlaceTo()) &&
           travelDto.getCountOfParticipants() >= 0 && travelDto.getCountOfParticipants() <= 4 &&
-          !travelDto.getAuthor().isEmpty() || travelDto.getStartTime()
+          !travelDto.getAuthorEmail().isEmpty() || travelDto.getStartTime()
           .isBefore(LocalDateTime.now());
     } catch (RuntimeException ex) {
       throw new BadRequestException("Wrong parameter value");
@@ -293,7 +293,7 @@ public class TravelService {
       throw new BadRequestException("Wrong parameter value");
     }
     TravelEntity travelEntity = travelRepository
-        .getTravelEntityByAuthorAndTravelStatusIn(travelDto.getAuthor(), statusesExceptClosed)
+        .getTravelEntityByAuthorAndTravelStatusIn(travelDto.getAuthorEmail(), statusesExceptClosed)
         .orElse(null);
     if (travelEntity == null) {
       throw new NotFoundException("Поездка не найдена");

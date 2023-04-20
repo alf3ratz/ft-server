@@ -8,6 +8,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,12 +38,13 @@ public class TravelController {
     return travelService.getAllOpenTravels(PageRequest.of(offset, limit));
   }
 
-  @PostMapping("/createTravel")
+  @PostMapping(value="/createTravel", consumes = MediaType.APPLICATION_JSON_VALUE)
   public TravelDto createTravel(@RequestBody TravelDto travelDto) {
     var newTravelEntity = travelService.createTravel(travelDto);
     //return conversionService.convert(newTravelEntity, TravelDto.class);
     return TravelDto.builder()
-        .author(newTravelEntity.getAuthor())
+        //.author(newTravelEntity.getAuthor())
+        .authorEmail(newTravelEntity.getAuthor())
         .createTime(newTravelEntity.getCreateTime())
         .startTime(newTravelEntity.getStartTime())
         .countOfParticipants(newTravelEntity.getCountOfParticipants())
@@ -111,7 +113,7 @@ public class TravelController {
     TravelEntity travelEntity = resultPair.getLeft();
     var userList = resultPair.getRight();
     return TravelDto.builder()
-        .author(travelEntity.getAuthor())
+        .authorEmail(travelEntity.getAuthor())
         .createTime(travelEntity.getCreateTime())
         .startTime(travelEntity.getStartTime())
         .countOfParticipants(travelEntity.getCountOfParticipants())

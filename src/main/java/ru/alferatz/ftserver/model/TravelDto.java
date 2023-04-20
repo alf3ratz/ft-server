@@ -12,16 +12,16 @@ import java.util.List;
 @Builder
 public class TravelDto {
 
-  @NonNull
-  @JsonProperty("author")
-  private String author;
+//  @NonNull
+//  @JsonProperty("author")
+//  private String author;
 
-  @JsonProperty("email")
-  private String email;
+  private String authorEmail;
 
   @JsonProperty("createTime")
   private LocalDateTime createTime;
 
+  @NonNull
   @JsonProperty("startTime")
   private LocalDateTime startTime;
 

@@ -49,14 +49,13 @@ class TravelServiceTest {
 
     // when
     TravelDto travelDto = TravelDto.builder()
-        .author(author)
+        .authorEmail(author)
         .countOfParticipants(1)
         .placeFrom("test_1")
         .placeTo("test_2")
         .build();
     TravelEntity savedTravel = travelService.createTravel(travelDto);
 
-    System.out.println(savedTravel);
     // then - verify the output
     assertThat(savedTravel).isNotNull();
   }

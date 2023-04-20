@@ -27,10 +27,8 @@ public class TravelEntity {
 
   private String author;
 
-  @JsonProperty("createTime")
   private LocalDateTime createTime;
 
-  @JsonProperty("startTime")
   private LocalDateTime startTime;
 
   private String placeFrom;

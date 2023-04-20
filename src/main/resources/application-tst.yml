@@ -6,3 +6,15 @@ spring:
     url: jdbc:postgresql://localhost:5432/ftapp
     username: ftapp
     password: ftapp
+#  security:
+#    oauth2:
+#      client:
+#        clientId: fe0df921-754d-45e8-8d48-1fcef2d91df8
+#        userAuthorizationUri: https://auth.hse.ru/adfs/oauth2/authorize?resource=[MyRelyingPartyTrust]
+#        accessTokenUri: https:///auth.hse.ru/adfs/oauth2/token
+#        tokenName: code
+#        authenticationScheme: query
+#        clientAuthenticationScheme: form
+#        grant-type: authorization_code
+#      resource:
+#        userInfoUri: https:///auth.hse.ru/adfs/oauth2/token
