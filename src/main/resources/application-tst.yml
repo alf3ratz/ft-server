@@ -6,15 +6,27 @@ spring:
     url: jdbc:postgresql://localhost:5432/ftapp
     username: ftapp
     password: ftapp
-#  security:
-#    oauth2:
-#      client:
-#        clientId: fe0df921-754d-45e8-8d48-1fcef2d91df8
-#        userAuthorizationUri: https://auth.hse.ru/adfs/oauth2/authorize?resource=[MyRelyingPartyTrust]
-#        accessTokenUri: https:///auth.hse.ru/adfs/oauth2/token
-#        tokenName: code
-#        authenticationScheme: query
-#        clientAuthenticationScheme: form
-#        grant-type: authorization_code
+  security:
+    oauth2:
+      client:
+        clientId: fe0df921-754d-45e8-8d48-1fcef2d91df8
+        #        userAuthorizationUri: https://auth.hse.ru/adfs/oauth2/authorize?resource=[MyRelyingPartyTrust]
+        #        accessTokenUri: https:///auth.hse.ru/adfs/oauth2/token
+
+        #        tokenName: code
+        #        authenticationScheme: query
+        #        clientAuthenticationScheme: form
+        #        grant-type: authorization_code
+        redirectUri: https://ftapp.herokuapp.com/auth/hse_redirect
+        clientAuthenticationScheme: form
 #      resource:
 #        userInfoUri: https:///auth.hse.ru/adfs/oauth2/token
+#        github:
+#          client:
+#            clientId: <your_github_clientId>
+#            clientSecret: <your_github_clientSecret>
+#            accessTokenUri: https://github.com/login/oauth/access_token
+#            userAuthorizationUri: https://github.com/login/oauth/authorize
+#            clientAuthenticationScheme: form
+#          resource:
+#            userInfoUri: https://api.github.com/user
