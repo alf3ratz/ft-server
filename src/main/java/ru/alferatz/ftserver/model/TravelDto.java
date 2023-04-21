@@ -12,6 +12,7 @@ import java.util.List;
 @Builder
 public class TravelDto {
 
+  private Long id;
 
   private String authorEmail;
 

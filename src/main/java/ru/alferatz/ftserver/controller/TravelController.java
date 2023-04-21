@@ -56,6 +56,7 @@ public class TravelController {
     var newTravelEntity = travelService.createTravel(travelDto);
     //return conversionService.convert(newTravelEntity, TravelDto.class);
     return TravelDto.builder()
+        .id(newTravelEntity.getId())
         .authorEmail(newTravelEntity.getAuthor())
         .createTime(newTravelEntity.getCreateTime().toString())
         .startTime(newTravelEntity.getStartTime().toString())
@@ -125,6 +126,7 @@ public class TravelController {
     TravelEntity travelEntity = resultPair.getLeft();
     var userList = resultPair.getRight();
     return TravelDto.builder()
+        .id(travelEntity.getId())
         .authorEmail(travelEntity.getAuthor())
         .createTime(travelEntity.getCreateTime().toString())
         .startTime(travelEntity.getStartTime().toString())

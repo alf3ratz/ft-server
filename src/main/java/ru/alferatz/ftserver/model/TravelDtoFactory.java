@@ -9,6 +9,7 @@ public class TravelDtoFactory {
 
   public TravelDto makeTravelDto(TravelEntity travelEntity, List<UserDto> participants){
     return TravelDto.builder()
+        .id(travelEntity.getId())
         .authorEmail(travelEntity.getAuthor())
         .createTime(travelEntity.getCreateTime().toString())
         .startTime(travelEntity.getStartTime().toString())
