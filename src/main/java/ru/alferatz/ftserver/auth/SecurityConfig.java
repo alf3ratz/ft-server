@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.Ordered;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -41,25 +42,29 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   private final OAuth2ClientContext oauth2ClientContext;
   private static final String[] AUTH_LIST = {
       "/v3/api-docs/**", "/configuration/ui", "/swagger-resources/**", "/configuration/security",
-      "/swagger-ui/**", "/webjars/**", "/", "/login**", "/error**","/api/auth/login"
+      "/swagger-ui/**", "/webjars/**", "/", "/login**", "/error**", "/api/**"
   };
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     CorsConfiguration corsConfiguration = new CorsConfiguration();
-    corsConfiguration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
-    corsConfiguration.setAllowedOrigins(List.of("*"));
-    corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PUT","OPTIONS","PATCH", "DELETE"));
-    corsConfiguration.setAllowCredentials(true);
-    corsConfiguration.setExposedHeaders(List.of("Authorization"));
-    http.authorizeRequests().antMatchers(AUTH_LIST).permitAll().anyRequest()
+//    corsConfiguration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
+//    corsConfiguration.setAllowedOrigins(List.of("*"));
+    corsConfiguration.setAllowedMethods(
+        List.of("GET", "POST", "PUT", "DELETE", "PUT", "OPTIONS", "PATCH", "DELETE"));
+//    corsConfiguration.setAllowCredentials(true);
+//    corsConfiguration.setExposedHeaders(List.of("Authorization"));
+    http.authorizeRequests().antMatchers(AUTH_LIST).permitAll()
+        .antMatchers(HttpMethod.POST, "/api/**")
+        .permitAll().anyRequest()
         .authenticated()
         .and().logout().logoutUrl("/logout").logoutSuccessUrl("/");
-        //.and().httpBasic().disable();
-        //.and().addFilterBefore(oauth2ClientFilter(), BasicAuthenticationFilter.class);
+    //.and().httpBasic().disable();
+    //.and().addFilterBefore(oauth2ClientFilter(), BasicAuthenticationFilter.class);
     http
         .addFilterBefore(new OAuth2ClientContextFilter(), BasicAuthenticationFilter.class)
-        .addFilterAfter(oauth2ClientAuthenticationProcessingFilter(), OAuth2ClientContextFilter.class)
+        .addFilterAfter(oauth2ClientAuthenticationProcessingFilter(),
+            OAuth2ClientContextFilter.class)
     ;
   }
 
@@ -90,7 +95,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   private OAuth2ClientAuthenticationProcessingFilter oauth2ClientAuthenticationProcessingFilter() {
     OAuth2ClientAuthenticationProcessingFilter
-        daFilter = new OAuth2ClientAuthenticationProcessingFilter("/api/**");
+        daFilter = new OAuth2ClientAuthenticationProcessingFilter("/auth/**");
     daFilter.setRestTemplate(oAuth2RestTemplate);
     daFilter.setTokenServices(inMemoryTokenServices());
     return daFilter;
@@ -103,11 +108,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     return tokenService;
   }
-
-
-
-
-
 
 //  @Bean
 //  @ConfigurationProperties("spring.security.oauth2.client")

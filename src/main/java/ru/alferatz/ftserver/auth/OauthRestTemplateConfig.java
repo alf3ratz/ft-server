@@ -32,7 +32,7 @@ public class OauthRestTemplateConfig {
     details.setUserAuthorizationUri("https://auth.hse.ru/adfs/oauth2/authorize");
     details.setTokenName("accessToken");
     details.setPreEstablishedRedirectUri("https://ftapp.herokuapp.com/auth/hse_redirect");
-   // details.setUseCurrentUri(true);
+    details.setUseCurrentUri(false);
     return details;//https://ftapp.herokuapp.com/auth/hse_redirect
   }
 }
