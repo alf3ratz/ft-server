@@ -15,6 +15,7 @@ import ru.alferatz.ftserver.chat.entity.ChatMessage;
 import ru.alferatz.ftserver.chat.entity.GetMessagesRequest;
 import ru.alferatz.ftserver.chat.repository.ChatMessageRepository;
 import ru.alferatz.ftserver.chat.repository.ChatRoomRepository;
+import ru.alferatz.ftserver.exceptions.AlreadyExistException;
 import ru.alferatz.ftserver.exceptions.InternalServerError;
 import ru.alferatz.ftserver.exceptions.NotFoundException;
 
@@ -24,7 +25,7 @@ public class ChatService {
 
   private static final Logger logger = LoggerFactory.getLogger(ChatService.class);
 
-//  private final SimpMessagingTemplate messagingTemplate;
+  //  private final SimpMessagingTemplate messagingTemplate;
   private final ChatRoomRepository chatRoomRepository;
   private final ChatMessageRepository chatMessageRepository;
   private final ChatMessageDtoFactory chatMessageDtoFactory;
@@ -44,7 +45,8 @@ public class ChatService {
     try {
       chatMessageRepository.save(chatMessage);
     } catch (RuntimeException e) {
-      throw new InternalServerError("Не удалось отправить сообщение в чат: {}".replace("{}", e.getMessage()));
+      throw new InternalServerError(
+          "Не удалось отправить сообщение в чат: {}".replace("{}", e.getMessage()));
     } finally {
       chatMessageRepository.flush();
     }
@@ -60,6 +62,10 @@ public class ChatService {
     ChatRoom newChat = ChatRoom.builder()
         .author(author)
         .build();
+    ChatRoom chat = chatRoomRepository.getChatRoomByUserEmail(author).orElse(null);
+    if (chat != null) {
+      throw new AlreadyExistException("Пользователь уже находится в активном чате");
+    }
     try {
       chatRoomRepository.save(newChat);
       return newChat.getId();
