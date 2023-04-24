@@ -72,7 +72,7 @@ public class ChatService {
     if (user.getChatId() != null) {
       throw new InternalServerError("Пользователь уже находится в активном чате");
     }
-    ChatRoom chat = chatRoomRepository.getChatRoomByUserEmail(authorEmail).orElse(null);
+    ChatRoom chat = chatRoomRepository.getChatRoomByAuthor(authorEmail).orElse(null);
     if (chat != null) {
       throw new AlreadyExistException("Пользователь уже создал чат");
     }

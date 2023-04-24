@@ -7,5 +7,5 @@ import ru.alferatz.ftserver.repository.entity.TravelEntity;
 
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
-  Optional<ChatRoom> getChatRoomByUserEmail(String userEmail);
+  Optional<ChatRoom> getChatRoomByAuthor(String userEmail);
 }
