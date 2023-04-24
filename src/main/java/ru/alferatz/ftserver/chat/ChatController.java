@@ -29,8 +29,8 @@ public class ChatController {
 //  }
 
   @PostMapping("/createChat")
-  public Long createChat(@RequestParam("author") String author) {
-    return chatService.createChatRoom(author);
+  public Long createChat(@RequestParam("authorEmail") String authorEmail) {
+    return chatService.createChatRoom(authorEmail);
   }
 
   @PostMapping("/deleteChat")

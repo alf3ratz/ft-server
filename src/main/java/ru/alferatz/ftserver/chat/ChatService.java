@@ -18,6 +18,8 @@ import ru.alferatz.ftserver.chat.repository.ChatRoomRepository;
 import ru.alferatz.ftserver.exceptions.AlreadyExistException;
 import ru.alferatz.ftserver.exceptions.InternalServerError;
 import ru.alferatz.ftserver.exceptions.NotFoundException;
+import ru.alferatz.ftserver.repository.UserRepository;
+import ru.alferatz.ftserver.repository.entity.UserEntity;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +31,7 @@ public class ChatService {
   private final ChatRoomRepository chatRoomRepository;
   private final ChatMessageRepository chatMessageRepository;
   private final ChatMessageDtoFactory chatMessageDtoFactory;
+  private final UserRepository userRepository;
 
   public void sendMessage(SendMessageRequest request) {
 
@@ -58,14 +61,19 @@ public class ChatService {
         .info(String.format("Message [%s] sent to chat: [%d] from: [%s]", message, chatId, sender));
   }
 
-  public Long createChatRoom(String author) {
+  public Long createChatRoom(String authorEmail) {
     ChatRoom newChat = ChatRoom.builder()
-        .author(author)
+        .author(authorEmail)
         .build();
-    ChatRoom chat = chatRoomRepository.getChatRoomByUserEmail(author).orElse(null);
+    UserEntity user = userRepository.getUserEntityByEmail(authorEmail).orElse(null);
+    if(user == null){
+      throw new NotFoundException("Пользователь не найден в системе");
+    }
+    ChatRoom chat = chatRoomRepository.getChatRoomByUserEmail(authorEmail).orElse(null);
     if (chat != null) {
       throw new AlreadyExistException("Пользователь уже находится в активном чате");
     }
+
     try {
       chatRoomRepository.save(newChat);
       return newChat.getId();
@@ -74,7 +82,7 @@ public class ChatService {
     } finally {
       chatRoomRepository.flush();
       logger
-          .info(String.format("Chat with id: [%d] created by [%s]", newChat.getId(), author));
+          .info(String.format("Chat with id: [%d] created by [%s]", newChat.getId(), authorEmail));
     }
   }
 
