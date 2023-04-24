@@ -15,6 +15,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
       " where t.email = :userEmail ", nativeQuery = true)
   void updateTravelAtUserEntityByEmail(String userEmail, Long travelId);
 
-  Optional<List<UserEntity>> getAllByTravelId(Long travelid);
+  Optional<List<UserEntity>> getAllByTravelId(Long travelId);
+
+  Optional<List<UserEntity>> getAllByChatId(Long chatId);
 
 }

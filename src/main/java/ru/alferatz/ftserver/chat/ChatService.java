@@ -66,12 +66,15 @@ public class ChatService {
         .author(authorEmail)
         .build();
     UserEntity user = userRepository.getUserEntityByEmail(authorEmail).orElse(null);
-    if(user == null){
+    if (user == null) {
       throw new NotFoundException("Пользователь не найден в системе");
+    }
+    if (user.getChatId() != null) {
+      throw new InternalServerError("Пользователь уже находится в активном чате");
     }
     ChatRoom chat = chatRoomRepository.getChatRoomByUserEmail(authorEmail).orElse(null);
     if (chat != null) {
-      throw new AlreadyExistException("Пользователь уже находится в активном чате");
+      throw new AlreadyExistException("Пользователь уже создал чат");
     }
 
     try {
@@ -88,11 +91,14 @@ public class ChatService {
 
   public void deleteChatRoom(Long chatId) {
     ChatRoom chatForDelete = chatRoomRepository.findById(chatId).orElse(null);
+    var usersInChat = userRepository.getAllByChatId(chatId).orElseGet(Collections::emptyList);
+    usersInChat.forEach(i -> i.setChatId(null));
     if (chatForDelete == null) {
       throw new NotFoundException("Чат не существует");
     }
     try {
       chatRoomRepository.delete(chatForDelete);
+      userRepository.saveAll(usersInChat);
     } catch (RuntimeException e) {
       throw new InternalServerError("Не удалось удалить чат: {}".replace("{}", e.getMessage()));
     } finally {
