@@ -330,6 +330,9 @@ public class TravelService {
     if (user == null) {
       throw new NotFoundException("Пользователь не был найден в системе");
     }
+    if(user.getTravelId() != null){
+      throw new InternalServerError("Пользователь уже находится в поездке");
+    }
     user.setTravelId(travelId);
     userRepository.saveAndFlush(user);
   }
