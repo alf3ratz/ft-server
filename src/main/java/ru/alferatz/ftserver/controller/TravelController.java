@@ -64,6 +64,7 @@ public class TravelController {
         .placeFrom(newTravelEntity.getPlaceFrom())
         .placeTo(newTravelEntity.getPlaceTo())
         .chatId(newTravelEntity.getChatId())
+        .comment(newTravelEntity.getComment())
         .build();
   }
 
@@ -135,6 +136,7 @@ public class TravelController {
         .placeTo(travelEntity.getPlaceTo())
         .participants(userList)
         .chatId(travelEntity.getChatId())
+        .comment(travelEntity.getComment())
         .build();
   }
 
