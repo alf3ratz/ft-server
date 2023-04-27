@@ -105,7 +105,6 @@ public class TravelService {
     openTravels.forEach(i -> {
       travelIdToUserListMap.put(i.getAuthor(), getUserDtoListFromUserEntityList(i.getId()));
     });
-    //getUserDtoListFromUserEntityList(travelEntity.getId());
     return Pair.of(openTravels, travelIdToUserListMap);
   }
 

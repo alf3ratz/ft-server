@@ -6,3 +6,14 @@ spring:
     url: jdbc:postgresql://localhost:5432/ftapp
     username: ftapp
     password: ftapp
+client:
+  hse:
+    url: https://auth.hse.ru
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#feign:
+#  oauth2:
+#    enabled: true
+#    clientRegistrationId: adfs

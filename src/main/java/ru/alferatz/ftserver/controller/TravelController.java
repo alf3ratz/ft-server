@@ -2,8 +2,8 @@ package ru.alferatz.ftserver.controller;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+//import javax.validation.constraints.Max;
+//import javax.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.core.convert.ConversionService;
@@ -35,26 +35,25 @@ public class TravelController {
   private final ConversionService conversionService;
   private final TravelDtoFactory travelDtoFactory;
 
-  @GetMapping("/getAllTravels")
-  public Page<TravelDto> getOpenTravels(
-      @RequestParam(value = "offset", defaultValue = "0") @Min(0) Integer offset,
-      @RequestParam(value = "limit", defaultValue = "10") @Min(1) @Max(10) Integer limit) {
-
-    var openTravelsPair = travelService.getAllOpenTravels(PageRequest.of(offset, limit));
-    Page<TravelEntity> openTravels = openTravelsPair.getLeft();
-    var map = openTravelsPair.getRight();
-    var openTravelList = openTravels
-        .stream()
-        .map(i -> travelDtoFactory.makeTravelDto(i, map.get(i.getAuthor())))
-        .collect(Collectors.toList());
-    return new PageImpl<>(openTravelList);
-
-  }
+//  @GetMapping("/getAllTravels")
+//  public Page<TravelDto> getOpenTravels(
+//      @RequestParam(value = "offset", defaultValue = "0") @Min(0) Integer offset,
+//      @RequestParam(value = "limit", defaultValue = "10") @Min(1) @Max(10) Integer limit) {
+//
+//    var openTravelsPair = travelService.getAllOpenTravels(PageRequest.of(offset, limit));
+//    Page<TravelEntity> openTravels = openTravelsPair.getLeft();
+//    var map = openTravelsPair.getRight();
+//    var openTravelList = openTravels
+//        .stream()
+//        .map(i -> travelDtoFactory.makeTravelDto(i, map.get(i.getAuthor())))
+//        .collect(Collectors.toList());
+//    return new PageImpl<>(openTravelList);
+//
+//  }
 
   @PostMapping("/createTravel")
   public TravelDto createTravel(@RequestBody TravelDto travelDto) {
     var newTravelEntity = travelService.createTravel(travelDto);
-    //return conversionService.convert(newTravelEntity, TravelDto.class);
     return TravelDto.builder()
         .id(newTravelEntity.getId())
         .authorEmail(newTravelEntity.getAuthor())
@@ -72,7 +71,6 @@ public class TravelController {
   public TravelDto updateTravel(@RequestBody TravelDto travelDto) {
     var resultPair = travelService.updateTravel(travelDto);
     return buildTravelDto(resultPair);
-//    return conversionService.convert(updatedTravelEntity, TravelDto.class);
   }
 
 
@@ -105,10 +103,7 @@ public class TravelController {
 
   @PostMapping("/deleteTravel")
   public Integer deleteTravel(@RequestParam Long travelId) {
-    //var deletedTravelEntity =
     return travelService.deleteTravel(travelId);
-    //return conversionService.convert(deletedTravelEntity, TravelDto.class);
-    //return TravelDto.builder().author(new UserDto()).build();
   }
 
   @GetMapping("/getTravelById")
