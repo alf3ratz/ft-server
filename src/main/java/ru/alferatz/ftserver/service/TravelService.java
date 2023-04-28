@@ -129,6 +129,10 @@ public class TravelService {
     if (travelEntity == null) {
       throw new NotFoundException("Поездка не была найдена");
     }
+    UserEntity user = userRepository.getUserEntityByEmail(request.getEmail()).orElse(null);
+    if(user.getTravelId() != null){
+      throw new InternalServerError("Пользователь уже находится в поездке");
+    }
     linkParticipantToTravel(request.getEmail(), travelEntity.getId());
     // Присоединили попутчика к чату поездки
     linkParticipantToChat(request.getEmail(), travelEntity.getChatId());
