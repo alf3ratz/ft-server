@@ -132,7 +132,7 @@ public class AuthController {
 //  }
 
 
-  @GetMapping("/redirect_hse")
+  @GetMapping("/hse_redirect")
   public void redirectCallback(@RequestParam("access_token") String accessToken) {
     var usr = UserEntity.builder()
         .travelId(1L)
