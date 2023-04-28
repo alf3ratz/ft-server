@@ -56,7 +56,7 @@ public class TravelService {
       throw new AlreadyExistException("У пользователя уже имеется активная поездка");
     }
     UserEntity user = userRepository.getUserEntityByEmail(travelDto.getAuthorEmail()).orElse(null);
-    if(user.getTravelId() != null){
+    if (user.getTravelId() != null) {
       throw new InternalServerError("Пользователь уже находится в поездке");
     }
     // Создали чат, в котором потому будут общаться попутчики
@@ -133,7 +133,7 @@ public class TravelService {
       throw new NotFoundException("Поездка не была найдена");
     }
     UserEntity user = userRepository.getUserEntityByEmail(request.getEmail()).orElse(null);
-    if(user.getTravelId() != null){
+    if (user.getTravelId() != null) {
       throw new InternalServerError("Пользователь уже находится в поездке");
     }
     linkParticipantToTravel(request.getEmail(), travelEntity.getId());
@@ -337,7 +337,7 @@ public class TravelService {
     if (user == null) {
       throw new NotFoundException("Пользователь не был найден в системе");
     }
-    if(user.getTravelId() != null){
+    if (user.getTravelId() != null) {
       throw new InternalServerError("Пользователь уже находится в поездке");
     }
     user.setTravelId(travelId);
@@ -350,7 +350,13 @@ public class TravelService {
       throw new NotFoundException("Пользователь не был найден в системе");
     }
     user.setTravelId(null);
-    userRepository.saveAndFlush(user);
+    try {
+      userRepository.save(user);
+    } catch (RuntimeException e) {
+      throw new InternalServerError("Не удалось выйти из поездки");
+    } finally {
+      userRepository.flush();
+    }
   }
 
   private void linkParticipantToChat(String participantEmail, Long chatId) {
