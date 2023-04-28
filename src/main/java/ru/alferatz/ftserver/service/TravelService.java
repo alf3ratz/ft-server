@@ -27,7 +27,6 @@ import java.util.*;
 
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class TravelService {
 
