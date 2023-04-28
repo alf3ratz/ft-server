@@ -70,9 +70,9 @@ public class TravelService {
     } finally {
       chatRoomRepository.flush();
     }
-    var chat = chatRoomRepository.getChatRoomByAuthor(travelDto.getAuthorEmail()).orElse(null);
+    //var chat = chatRoomRepository.getChatRoomByAuthor(travelDto.getAuthorEmail()).orElse(null);
     // Присоединили создателя поездки к чату
-    linkParticipantToChat(travelDto.getAuthorEmail(), chat.getId());
+    linkParticipantToChat(travelDto.getAuthorEmail(), newChatRoom.getId());
 
     // Создали объявление, которое сохранится в базе
     travelEntity = TravelEntity.builder()
