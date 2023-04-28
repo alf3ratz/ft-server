@@ -56,6 +56,10 @@ public class TravelService {
     if (travelEntity != null) {
       throw new AlreadyExistException("У пользователя уже имеется активная поездка");
     }
+    UserEntity user = userRepository.getUserEntityByEmail(travelDto.getAuthorEmail()).orElse(null);
+    if(user.getTravelId() != null){
+      throw new InternalServerError("Пользователь уже находится в поездке");
+    }
     // Создали чат, в котором потому будут общаться попутчики
     ChatRoom newChatRoom = ChatRoom.builder()
         .author(travelDto.getAuthorEmail())
@@ -82,7 +86,7 @@ public class TravelService {
         .comment(travelDto.getComment())
         .chatId(newChatRoom.getId())
         .build();
-    var user = userRepository.getUserEntityByEmail(travelDto.getAuthorEmail()).orElse(null);
+    user = userRepository.getUserEntityByEmail(travelDto.getAuthorEmail()).orElse(null);
     if (user == null) {
       throw new NotFoundException("Пользователя, создающего поездку, нет в базе");
     }
