@@ -84,8 +84,6 @@ public class AuthController {
           .setClientId("fe0df921-754d-45e8-8d48-1fcef2d91df8")
           .setRedirectURI("https://ftapp.herokuapp.com/auth/hse_redirect")
           .setResponseType(ResponseType.CODE.toString())
-//          .setScope(oauthParams.getScope())
-//          .setState(oauthParams.getState())
           .buildQueryMessage();
 
       var qw = new ModelAndView(new RedirectView(request.getLocationUri()));
@@ -102,8 +100,6 @@ public class AuthController {
         .setClientId("fe0df921-754d-45e8-8d48-1fcef2d91df8")
         .setRedirectURI("https://ftapp.herokuapp.com/auth/hse_redirect")
         .setResponseType(ResponseType.TOKEN.toString())
-//          .setScope(oauthParams.getScope())
-//          .setState(oauthParams.getState())
         .buildQueryMessage();
     response.sendRedirect(request.getLocationUri());
   }
