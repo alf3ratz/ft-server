@@ -70,8 +70,9 @@ public class TravelService {
     } finally {
       chatRoomRepository.flush();
     }
+    var chat = chatRoomRepository.getChatRoomByAuthor(travelDto.getAuthorEmail()).orElse(null);
     // Присоединили создателя поездки к чату
-    linkParticipantToChat(travelDto.getAuthorEmail(), newChatRoom.getId());
+    linkParticipantToChat(travelDto.getAuthorEmail(), chat.getId());
 
     // Создали объявление, которое сохранится в базе
     travelEntity = TravelEntity.builder()
@@ -91,13 +92,19 @@ public class TravelService {
     }
     try {
       travelRepository.save(travelEntity);
-      user.setTravelId(travelEntity.getId());
+    } catch (RuntimeException ex) {
+      throw new InternalServerError("Не удалось добавить поездку в базу");
+    } finally {
+      travelRepository.flush();
+    }
+    try {
+      var travel = travelRepository.getTravelEntitiesByAuthor(user.getEmail()).orElse(null);
+      user.setTravelId(travel.getId());
       userRepository.save(user);
       return travelEntity;
     } catch (RuntimeException ex) {
       throw new InternalServerError("Не удалось добавить поездку в базу");
     } finally {
-      travelRepository.flush();
       userRepository.flush();
     }
   }
