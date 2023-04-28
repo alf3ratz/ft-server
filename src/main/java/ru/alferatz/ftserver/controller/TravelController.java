@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 //import javax.validation.constraints.Max;
 //import javax.validation.constraints.Min;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.core.convert.ConversionService;
@@ -35,21 +37,21 @@ public class TravelController {
   private final ConversionService conversionService;
   private final TravelDtoFactory travelDtoFactory;
 
-//  @GetMapping("/getAllTravels")
-//  public Page<TravelDto> getOpenTravels(
-//      @RequestParam(value = "offset", defaultValue = "0") @Min(0) Integer offset,
-//      @RequestParam(value = "limit", defaultValue = "10") @Min(1) @Max(10) Integer limit) {
-//
-//    var openTravelsPair = travelService.getAllOpenTravels(PageRequest.of(offset, limit));
-//    Page<TravelEntity> openTravels = openTravelsPair.getLeft();
-//    var map = openTravelsPair.getRight();
-//    var openTravelList = openTravels
-//        .stream()
-//        .map(i -> travelDtoFactory.makeTravelDto(i, map.get(i.getAuthor())))
-//        .collect(Collectors.toList());
-//    return new PageImpl<>(openTravelList);
-//
-//  }
+  @GetMapping("/getAllTravels")
+  public Page<TravelDto> getOpenTravels(
+      @RequestParam(value = "offset", defaultValue = "0") @Min(0) Integer offset,
+      @RequestParam(value = "limit", defaultValue = "10") @Min(1) @Max(10) Integer limit) {
+
+    var openTravelsPair = travelService.getAllOpenTravels(PageRequest.of(offset, limit));
+    Page<TravelEntity> openTravels = openTravelsPair.getLeft();
+    var map = openTravelsPair.getRight();
+    var openTravelList = openTravels
+        .stream()
+        .map(i -> travelDtoFactory.makeTravelDto(i, map.get(i.getAuthor())))
+        .collect(Collectors.toList());
+    return new PageImpl<>(openTravelList);
+
+  }
 
   @PostMapping("/createTravel")
   public TravelDto createTravel(@RequestBody TravelDto travelDto) {

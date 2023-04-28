@@ -6,6 +6,25 @@ spring:
     url: jdbc:postgresql://localhost:5432/ftapp
     username: ftapp
     password: ftapp
+  security:
+    oauth2:
+      client:
+        registration:
+          hse:
+            clientId: fe0df921-754d-45e8-8d48-1fcef2d91df8
+            #userAuthorizationUri: https://auth.hse.ru/adfs/oauth2/authorize
+#            client-authentication-method: post
+            authorization-grant-type: implicit
+            redirectUri: https://ftapp.herokuapp.com/auth/hse_redirect
+            #tokenUri: https://auth.hse.ru/adfs/oauth2/authorize
+        provider:
+          hse:
+            authorizationUri: https://auth.hse.ru/adfs/oauth2/authorize
+#            tokenUri: https://auth.hse.ru/adfs/oauth2/token
+#        provider:
+#          hse:
+#            authorizationUri: https://auth.hse.ru/adfs/oauth2/authorize
+#            tokenUri: https://auth.hse.ru/adfs/oauth2/authorize
 client:
   hse:
     url: https://auth.hse.ru
