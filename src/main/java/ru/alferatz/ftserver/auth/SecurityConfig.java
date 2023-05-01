@@ -173,5 +173,5 @@
 ////        .oauth2Client();
 ////    return http.build();
 ////  }
-////https://auth.hse.ru/adfs/oauth2/authorize?response_type=token&client_id=fe0df921-754d-45e8-8d48-1fcef2d91df8&redirect_uri=https://ftapp.herokuapp.com/auth/hse_redirect
+////https://auth.hse.ru/adfs/oauth2/authorize?response_type=token&client_id=fe0df921-754d-45e8-8d48-1fcef2d91df8&redirect_uri=https://ftapp.herokuapp.com/auth/hse_redirect&response_mode=query
 //
