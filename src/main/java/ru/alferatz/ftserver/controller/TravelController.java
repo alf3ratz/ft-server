@@ -32,7 +32,6 @@ import ru.alferatz.ftserver.service.TravelService;
 public class TravelController {
 
   private final TravelService travelService;
-  private final ConversionService conversionService;
   private final TravelDtoFactory travelDtoFactory;
 
   @GetMapping("/getAllTravels")
@@ -54,7 +53,6 @@ public class TravelController {
   @PostMapping("/createTravel")
   public TravelDto createTravel(@RequestBody TravelDto travelDto) {
     var newTravelEntity = travelService.createTravel(travelDto);
-    //return conversionService.convert(newTravelEntity, TravelDto.class);
     return TravelDto.builder()
         .id(newTravelEntity.getId())
         .authorEmail(newTravelEntity.getAuthor())
@@ -70,74 +68,33 @@ public class TravelController {
 
   @PostMapping("/updateTravel")
   public TravelDto updateTravel(@RequestBody TravelDto travelDto) {
-    var resultPair = travelService.updateTravel(travelDto);
-    return buildTravelDto(resultPair);
-//    return conversionService.convert(updatedTravelEntity, TravelDto.class);
+    return travelService.updateTravel(travelDto);
   }
 
 
   @PostMapping("/addTraveller")
   public TravelDto addParticipantToTravel(@RequestBody ConnectToTravelRequest request) {
-    var resultPair = travelService.addParticipant(request);
-    return buildTravelDto(resultPair);
+    return travelService.addParticipant(request);
   }
 
   @PostMapping("/reduceTravaller")
   public TravelDto reduceParticipantFromTravel(@RequestBody ConnectToTravelRequest request) {
-    var resultPair = travelService.reduceParticipant(request);
-    return buildTravelDto(resultPair);
+    return travelService.reduceParticipant(request);
   }
-
-  @Deprecated
-  @PostMapping("/addTravellerOld")
-  public TravelDto addParticipantToTravelOld(@RequestBody TravelDto travelDto) {
-    var updatedTravelEntity = travelService.addParticipantOld(travelDto);
-    return conversionService.convert(updatedTravelEntity, TravelDto.class);
-  }
-
-  @Deprecated
-  @PostMapping("/reduceTravallerOld")
-  public TravelDto reduceParticipantFromTravelOld(@RequestBody TravelDto travelDto) {
-    var updatedTravelEntity = travelService.reduceParticipantOld(travelDto);
-    return conversionService.convert(updatedTravelEntity, TravelDto.class);
-  }
-
 
   @PostMapping("/deleteTravel")
   public Integer deleteTravel(@RequestParam Long travelId) {
-    //var deletedTravelEntity =
     return travelService.deleteTravel(travelId);
-    //return conversionService.convert(deletedTravelEntity, TravelDto.class);
-    //return TravelDto.builder().author(new UserDto()).build();
   }
 
   @GetMapping("/getTravelById")
   public TravelDto getTravelById(@RequestParam(value = "travelId") Long travelId) {
-    var resultPair = travelService.getTravelById(travelId);
-    return buildTravelDto(resultPair);
+    return travelService.getTravelById(travelId);
   }
 
   @GetMapping("/getTravelByUserEmail")
   public TravelDto getTravelById(@RequestParam(value = "userEmail") String email) {
-    var resultPair = travelService.getTravelByUserEmail(email);
-    return buildTravelDto(resultPair);
-  }
-
-  private TravelDto buildTravelDto(Pair<TravelEntity, List<UserDto>> resultPair) {
-    TravelEntity travelEntity = resultPair.getLeft();
-    var userList = resultPair.getRight();
-    return TravelDto.builder()
-        .id(travelEntity.getId())
-        .authorEmail(travelEntity.getAuthor())
-        .createTime(travelEntity.getCreateTime().toString())
-        .startTime(travelEntity.getStartTime().toString())
-        .countOfParticipants(travelEntity.getCountOfParticipants())
-        .placeFrom(travelEntity.getPlaceFrom())
-        .placeTo(travelEntity.getPlaceTo())
-        .participants(userList)
-        .chatId(travelEntity.getChatId())
-        .comment(travelEntity.getComment())
-        .build();
+    return travelService.getTravelByUserEmail(email);
   }
 
 

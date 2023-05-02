@@ -1,16 +1,16 @@
 package ru.alferatz.ftserver.repository.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+
 import java.time.LocalDateTime;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import lombok.*;
-import ru.alferatz.ftserver.model.UserDto;
-
-import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.io.Serializable;
+import lombok.*;
+
 
 @Getter
 @Setter

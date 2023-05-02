@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.stereotype.Component;
 import ru.alferatz.ftserver.exceptions.InternalServerError;
 import ru.alferatz.ftserver.exceptions.NotFoundException;
 import ru.alferatz.ftserver.model.TravelDto;
@@ -12,6 +14,7 @@ import ru.alferatz.ftserver.repository.UserRepository;
 import ru.alferatz.ftserver.repository.entity.TravelEntity;
 import ru.alferatz.ftserver.repository.entity.UserEntity;
 
+@Component
 public class TravelServiceUtils {
 
   public void linkParticipantToChat(UserRepository userRepository, String participantEmail,
@@ -78,5 +81,20 @@ public class TravelServiceUtils {
         .orElse(Collections.emptyList());
     usersInTravel.forEach(i -> userDtoList.add(new UserDto(i.getUsername(), i.getEmail())));
     return userDtoList;
+  }
+
+  public TravelDto buildTravelDto(TravelEntity travelEntity, List<UserDto> userList) {
+    return TravelDto.builder()
+        .id(travelEntity.getId())
+        .authorEmail(travelEntity.getAuthor())
+        .createTime(travelEntity.getCreateTime().toString())
+        .startTime(travelEntity.getStartTime().toString())
+        .countOfParticipants(travelEntity.getCountOfParticipants())
+        .placeFrom(travelEntity.getPlaceFrom())
+        .placeTo(travelEntity.getPlaceTo())
+        .participants(userList)
+        .chatId(travelEntity.getChatId())
+        .comment(travelEntity.getComment())
+        .build();
   }
 }

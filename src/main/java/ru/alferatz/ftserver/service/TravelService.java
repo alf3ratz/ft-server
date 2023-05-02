@@ -118,7 +118,6 @@ public class TravelService {
       travelIdToUserListMap.put(i.getAuthor(),
           travelServiceUtils.getUserDtoListFromUserEntityList(userRepository, i.getId()));
     });
-    //getUserDtoListFromUserEntityList(travelEntity.getId());
     return Pair.of(openTravels, travelIdToUserListMap);
   }
 
@@ -134,7 +133,7 @@ public class TravelService {
     }
   }
 
-  public Pair<TravelEntity, List<UserDto>> addParticipant(ConnectToTravelRequest request) {
+  public TravelDto addParticipant(ConnectToTravelRequest request) {
     if (request.getTravelId() == null || request.getEmail().isEmpty()) {
       throw new BadRequestException("Неверный запрос");
     }
@@ -157,7 +156,7 @@ public class TravelService {
     travelEntity.setCountOfParticipants(travelEntity.getCountOfParticipants() + 1);
     try {
       travelRepository.save(travelEntity);
-      return Pair.of(travelEntity, userDtoList);
+      return travelServiceUtils.buildTravelDto(travelEntity, userDtoList);
     } catch (RuntimeException ex) {
       throw new InternalServerError("Не удалось обновить поездку в базе");
     } finally {
@@ -165,7 +164,7 @@ public class TravelService {
     }
   }
 
-  public Pair<TravelEntity, List<UserDto>> reduceParticipant(ConnectToTravelRequest request) {
+  public TravelDto reduceParticipant(ConnectToTravelRequest request) {
     if (request.getTravelId() == null || request.getEmail().isEmpty()) {
       throw new BadRequestException("Неверный запрос");
     }
@@ -183,7 +182,7 @@ public class TravelService {
     travelEntity.setCountOfParticipants(travelEntity.getCountOfParticipants() - 1);
     try {
       travelRepository.save(travelEntity);
-      return Pair.of(travelEntity, userDtoList);
+      return travelServiceUtils.buildTravelDto(travelEntity, userDtoList);
     } catch (RuntimeException ex) {
       throw new InternalServerError("Не удалось обновить поездку в базе");
     } finally {
@@ -191,7 +190,7 @@ public class TravelService {
     }
   }
 
-  public Pair<TravelEntity, List<UserDto>> updateTravel(TravelDto travelDto) {
+  public TravelDto updateTravel(TravelDto travelDto) {
     TravelEntity travelEntity = checkTravel(travelDto);
     List<UserDto> userDtoList = travelServiceUtils
         .getUserDtoListFromUserEntityList(userRepository, travelEntity.getId());
@@ -204,14 +203,14 @@ public class TravelService {
       travelEntity.setComment(travelDto.getComment());
       try {
         travelRepository.save(travelEntity);
-        return Pair.of(travelEntity, userDtoList);
+        return travelServiceUtils.buildTravelDto(travelEntity, userDtoList);
       } catch (RuntimeException ex) {
         throw new InternalServerError("Не удалось обновить поездку в базе");
       } finally {
         travelRepository.flush();
       }
     }
-    return Pair.of(travelEntity, userDtoList);
+    return travelServiceUtils.buildTravelDto(travelEntity, userDtoList);
   }
 
   /**
@@ -258,6 +257,37 @@ public class TravelService {
     } finally {
       travelRepository.flush();
     }
+  }
+
+  public TravelDto getTravelById(Long travelId) {
+    if (travelId <= 0) {
+      throw new BadRequestException("Неверный travelId");
+    }
+    TravelEntity travelEntity = travelRepository.findById(travelId).orElse(null);
+    if (travelEntity == null) {
+      throw new NotFoundException("Запрашиваемой поездки не существует");
+    }
+    List<UserDto> userDtoList = travelServiceUtils
+        .getUserDtoListFromUserEntityList(userRepository, travelEntity.getId());
+    return travelServiceUtils.buildTravelDto(travelEntity, userDtoList);
+  }
+
+  public TravelDto getTravelByUserEmail(String email) {
+    email = email.trim();
+    UserEntity user = userRepository.getUserEntityByEmail(email).orElse(null);
+    if (user == null) {
+      throw new NotFoundException("Пользователь не был найден в системе");
+    }
+    if (user.getTravelId() == null) {
+      throw new NotFoundException("Пользователь не находится в поездке");
+    }
+    TravelEntity travelEntity = travelRepository.findById(user.getTravelId()).orElse(null);
+    if (travelEntity == null) {
+      throw new NotFoundException("Поездка не найдена в системе");
+    }
+    List<UserDto> userDtoList = travelServiceUtils
+        .getUserDtoListFromUserEntityList(userRepository, travelEntity.getId());
+    return travelServiceUtils.buildTravelDto(travelEntity, userDtoList);
   }
 
 
