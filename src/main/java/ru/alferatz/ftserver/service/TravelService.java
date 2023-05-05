@@ -36,10 +36,11 @@ public class TravelService {
   private final UserRepository userRepository;
   private final ChatRoomRepository chatRoomRepository;
   private final Set<String> statusesExceptClosed = new HashSet<>(Arrays
-      .asList(TravelStatus.CREATED.name(), TravelStatus.PROCESSING.name(),
-          TravelStatus.IN_PROGRESS.name()));
-  private final Set<String> processingStatuses = new HashSet<>(Arrays
-      .asList(TravelStatus.CREATED.name(), TravelStatus.PROCESSING.name()));
+      .asList(TravelStatus.CREATED.name(), TravelStatus.IN_PROGRESS.name()));
+  private final Set<String> processingStatuses = new HashSet<>(
+      Collections.singletonList(TravelStatus.CREATED.name()));
+  private final Set<String> closedStatus = new HashSet<>(
+      Collections.singletonList(TravelStatus.CLOSED.name()));
 
   /**
    * Создание объявления
@@ -196,7 +197,6 @@ public class TravelService {
         .getUserDtoListFromUserEntityList(userRepository, travelEntity.getId());
     if (travelServiceUtils.isTravelChanged(travelEntity, travelDto)) {
       travelEntity.setCountOfParticipants(travelDto.getCountOfParticipants());
-      // TODO: подумать, как обновлять участников без полного цикла for (может быть лишняя работа)
       travelEntity.setCountOfParticipants(travelDto.getCountOfParticipants());
       travelEntity.setPlaceFrom(travelDto.getPlaceFrom());
       travelEntity.setPlaceTo(travelDto.getPlaceTo());
@@ -214,6 +214,20 @@ public class TravelService {
   }
 
   /**
+   * Получение всех закрытых поездок, метод для истории поездок
+   */
+  public Pair<Page<TravelEntity>, Map<String, List<UserDto>>> getAllClosedTravels(Pageable request,
+      String authorEmail) {
+    Map<String, List<UserDto>> travelIdToUserListMap = new HashMap<>();
+    var openTravels = travelRepository.getAllByTravelStatusInAndAuthorEquals(closedStatus, authorEmail, request);
+    openTravels.forEach(i -> {
+      travelIdToUserListMap.put(i.getAuthor(),
+          travelServiceUtils.getUserDtoListFromUserEntityList(userRepository, i.getId()));
+    });
+    return Pair.of(openTravels, travelIdToUserListMap);
+  }
+
+  /**
    * Проверяем, правильный ли объект пришел и есть ли поездка в базе
    *
    * @param travelDto - пришедший объект с информацией о поездке
@@ -227,12 +241,12 @@ public class TravelService {
         .getTravelEntityByAuthorAndTravelStatusIn(travelDto.getAuthorEmail(), statusesExceptClosed)
         .orElse(null);
     if (travelEntity == null) {
-      throw new NotFoundException("Поездка не найдена");
+      throw new NotFoundException("Поездка не найдена или уже закрыта");
     }
     return travelEntity;
   }
 
-  public Integer deleteTravel(Long travelId) {
+  public Long deleteTravel(Long travelId) {
     if (travelId <= 0) {
       throw new BadRequestException("Wrong parameter value");
     }
@@ -247,11 +261,12 @@ public class TravelService {
           .unlinkParticipantToTravel(userRepository, i.getEmail(), travelEntity.getId());
     });
     try {
-      var deletedTravelCount = travelRepository.deleteTravelEntityById(travelId);
-      if (deletedTravelCount == 0) {
+      var closedTravel = travelRepository.setStatusToTravel(travelId, TravelStatus.CLOSED.name());
+      //var deletedTravelCount = travelRepository.deleteTravelEntityById(travelId);
+      if (closedTravel.isEmpty()) {
         throw new NotFoundException("Can not delete travel");
       }
-      return deletedTravelCount;
+      return travelId;
     } catch (RuntimeException e) {
       throw new InternalServerError("Не удалось удалить поездку");
     } finally {

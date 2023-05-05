@@ -19,6 +19,9 @@ public interface TravelRepository extends JpaRepository<TravelEntity, Long> {
 
   Page<TravelEntity> getAllByTravelStatusIn(Collection<String> travelStatuses, Pageable request);
 
+  Page<TravelEntity> getAllByTravelStatusInAndAuthorEquals(Collection<String> travelStatuses,
+      String authorEmail, Pageable request);
+
   Optional<TravelEntity> getTravelEntitiesByAuthor(String author);
 
   Integer deleteTravelEntityByAuthor(String author);
@@ -27,4 +30,8 @@ public interface TravelRepository extends JpaRepository<TravelEntity, Long> {
 //  Optional<TravelEntity> getTravelEntityWithMaxId();
 
   Integer deleteTravelEntityById(Long id);
+
+  @Query("update TravelEntity travel set travel.travelStatus = ?2 where travel.id = ?1")
+  Optional<TravelEntity> setStatusToTravel(Long travelId, String status);
 }
+

@@ -50,6 +50,24 @@ public class TravelController {
 
   }
 
+  @GetMapping("/getTravelHistoryByAuthor")
+  public Page<TravelDto> getTravelHistoryByAuthor(
+      @RequestParam(value = "offset", defaultValue = "0") @Min(0) Integer offset,
+      @RequestParam(value = "limit", defaultValue = "10") @Min(1) @Max(10) Integer limit,
+      @RequestParam("authorEmail") String authorEmail) {
+
+    var openTravelsPair = travelService
+        .getAllClosedTravels(PageRequest.of(offset, limit), authorEmail);
+    Page<TravelEntity> openTravels = openTravelsPair.getLeft();
+    var map = openTravelsPair.getRight();
+    var openTravelList = openTravels
+        .stream()
+        .map(i -> travelDtoFactory.makeTravelDto(i, map.get(i.getAuthor())))
+        .collect(Collectors.toList());
+    return new PageImpl<>(openTravelList);
+
+  }
+
   @PostMapping("/createTravel")
   public TravelDto createTravel(@RequestBody TravelDto travelDto) {
     var newTravelEntity = travelService.createTravel(travelDto);
@@ -83,7 +101,7 @@ public class TravelController {
   }
 
   @PostMapping("/deleteTravel")
-  public Integer deleteTravel(@RequestParam Long travelId) {
+  public Long deleteTravel(@RequestParam Long travelId) {
     return travelService.deleteTravel(travelId);
   }
 
