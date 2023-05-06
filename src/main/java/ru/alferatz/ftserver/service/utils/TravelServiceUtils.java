@@ -75,10 +75,11 @@ public class TravelServiceUtils {
   }
 
   public List<UserDto> getUserDtoListFromUserEntityList(UserRepository userRepository,
-      Long travelId) {
+      Long travelId, String authorEmail) {
     List<UserDto> userDtoList = new ArrayList<>();
     List<UserEntity> usersInTravel = userRepository.getAllByTravelId(travelId)
         .orElse(Collections.emptyList());
+    usersInTravel.removeIf(user -> user.getUsername().equals(authorEmail));
     usersInTravel.forEach(i -> userDtoList.add(new UserDto(i.getUsername(), i.getEmail())));
     return userDtoList;
   }

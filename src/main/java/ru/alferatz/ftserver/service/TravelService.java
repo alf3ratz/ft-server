@@ -3,18 +3,16 @@ package ru.alferatz.ftserver.service;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.alferatz.ftserver.chat.entity.ChatRoom;
 import ru.alferatz.ftserver.chat.repository.ChatRoomRepository;
 import ru.alferatz.ftserver.exceptions.AlreadyExistException;
 import ru.alferatz.ftserver.exceptions.BadRequestException;
 import ru.alferatz.ftserver.exceptions.InternalServerError;
 import ru.alferatz.ftserver.exceptions.NotFoundException;
-import ru.alferatz.ftserver.model.ConnectToTravelRequest;
+import ru.alferatz.ftserver.model.request.ConnectToTravelRequest;
 import ru.alferatz.ftserver.model.TravelDto;
 import ru.alferatz.ftserver.model.UserDto;
 import ru.alferatz.ftserver.repository.TravelRepository;
@@ -117,7 +115,8 @@ public class TravelService {
     var openTravels = travelRepository.getAllByTravelStatusIn(processingStatuses, request);
     openTravels.forEach(i -> {
       travelIdToUserListMap.put(i.getAuthor(),
-          travelServiceUtils.getUserDtoListFromUserEntityList(userRepository, i.getId()));
+          travelServiceUtils
+              .getUserDtoListFromUserEntityList(userRepository, i.getId(), i.getAuthor()));
     });
     return Pair.of(openTravels, travelIdToUserListMap);
   }
@@ -153,7 +152,8 @@ public class TravelService {
         .linkParticipantToChat(userRepository, request.getEmail(), travelEntity.getChatId());
 
     List<UserDto> userDtoList = travelServiceUtils
-        .getUserDtoListFromUserEntityList(userRepository, travelEntity.getId());
+        .getUserDtoListFromUserEntityList(userRepository, travelEntity.getId(),
+            travelEntity.getAuthor());
     travelEntity.setCountOfParticipants(travelEntity.getCountOfParticipants() + 1);
     try {
       travelRepository.save(travelEntity);
@@ -179,7 +179,8 @@ public class TravelService {
     travelServiceUtils.unlinkParticipantFromChat(userRepository, request.getEmail());
 
     List<UserDto> userDtoList = travelServiceUtils
-        .getUserDtoListFromUserEntityList(userRepository, travelEntity.getId());
+        .getUserDtoListFromUserEntityList(userRepository, travelEntity.getId(),
+            travelEntity.getAuthor());
     travelEntity.setCountOfParticipants(travelEntity.getCountOfParticipants() - 1);
     try {
       travelRepository.save(travelEntity);
@@ -194,7 +195,8 @@ public class TravelService {
   public TravelDto updateTravel(TravelDto travelDto) {
     TravelEntity travelEntity = checkTravel(travelDto);
     List<UserDto> userDtoList = travelServiceUtils
-        .getUserDtoListFromUserEntityList(userRepository, travelEntity.getId());
+        .getUserDtoListFromUserEntityList(userRepository, travelEntity.getId(),
+            travelEntity.getAuthor());
     if (travelServiceUtils.isTravelChanged(travelEntity, travelDto)) {
       travelEntity.setCountOfParticipants(travelDto.getCountOfParticipants());
       travelEntity.setCountOfParticipants(travelDto.getCountOfParticipants());
@@ -219,10 +221,12 @@ public class TravelService {
   public Pair<Page<TravelEntity>, Map<String, List<UserDto>>> getAllClosedTravels(Pageable request,
       String authorEmail) {
     Map<String, List<UserDto>> travelIdToUserListMap = new HashMap<>();
-    var openTravels = travelRepository.getAllByTravelStatusInAndAuthorEquals(closedStatus, authorEmail, request);
+    var openTravels = travelRepository
+        .getAllByTravelStatusInAndAuthorEquals(closedStatus, authorEmail, request);
     openTravels.forEach(i -> {
       travelIdToUserListMap.put(i.getAuthor(),
-          travelServiceUtils.getUserDtoListFromUserEntityList(userRepository, i.getId()));
+          travelServiceUtils
+              .getUserDtoListFromUserEntityList(userRepository, i.getId(), i.getAuthor()));
     });
     return Pair.of(openTravels, travelIdToUserListMap);
   }
@@ -283,13 +287,14 @@ public class TravelService {
       throw new NotFoundException("Запрашиваемой поездки не существует");
     }
     List<UserDto> userDtoList = travelServiceUtils
-        .getUserDtoListFromUserEntityList(userRepository, travelEntity.getId());
+        .getUserDtoListFromUserEntityList(userRepository, travelEntity.getId(),
+            travelEntity.getAuthor());
     return travelServiceUtils.buildTravelDto(travelEntity, userDtoList);
   }
 
-  public TravelDto getTravelByUserEmail(String email) {
-    email = email.trim();
-    UserEntity user = userRepository.getUserEntityByEmail(email).orElse(null);
+  public TravelDto getTravelByUserEmail(String authorEmail) {
+    authorEmail = authorEmail.trim();
+    UserEntity user = userRepository.getUserEntityByEmail(authorEmail).orElse(null);
     if (user == null) {
       throw new NotFoundException("Пользователь не был найден в системе");
     }
@@ -301,9 +306,27 @@ public class TravelService {
       throw new NotFoundException("Поездка не найдена в системе");
     }
     List<UserDto> userDtoList = travelServiceUtils
-        .getUserDtoListFromUserEntityList(userRepository, travelEntity.getId());
+        .getUserDtoListFromUserEntityList(userRepository, travelEntity.getId(), authorEmail);
     return travelServiceUtils.buildTravelDto(travelEntity, userDtoList);
   }
 
+  public TravelDto setLeadershipToParticipant(Long travelId, String participantEmail) {
+    TravelEntity travelEntity = travelRepository.findById(travelId).orElse(new TravelEntity());
+    String authorEmail = travelEntity.getAuthor();
+    if (authorEmail.equals(participantEmail.trim())) {
+      throw new InternalServerError("Автор не может передать лидерство самому себе");
+    }
+    travelEntity.setAuthor(participantEmail);
+    try {
+      travelRepository.save(travelEntity);
+      List<UserDto> userDtoList = travelServiceUtils
+          .getUserDtoListFromUserEntityList(userRepository, travelEntity.getId(), participantEmail);
+      return travelServiceUtils.buildTravelDto(travelEntity, userDtoList);
+    } catch (RuntimeException ex) {
+      throw new InternalServerError("Не удалось передать лидерство поездкой");
+    } finally {
+      travelRepository.flush();
+    }
+  }
 
 }

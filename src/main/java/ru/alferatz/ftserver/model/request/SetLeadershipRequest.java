@@ -1,10 +1,9 @@
-package ru.alferatz.ftserver.model;
+package ru.alferatz.ftserver.model.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Builder
@@ -12,8 +11,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ConnectToTravelRequest {
+public class SetLeadershipRequest {
 
   private Long travelId;
-  private String email;
+  private String participantEmail;
 }
