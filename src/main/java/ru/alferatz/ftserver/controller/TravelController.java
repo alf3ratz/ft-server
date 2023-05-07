@@ -5,12 +5,9 @@ import java.util.stream.Collectors;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.alferatz.ftserver.model.ConnectToTravelRequest;
 import ru.alferatz.ftserver.model.TravelDto;
 import ru.alferatz.ftserver.model.TravelDtoFactory;
-import ru.alferatz.ftserver.model.UserDto;
 import ru.alferatz.ftserver.repository.entity.TravelEntity;
 import ru.alferatz.ftserver.service.TravelService;
 
@@ -55,16 +51,15 @@ public class TravelController {
       @RequestParam(value = "offset", defaultValue = "0") @Min(0) Integer offset,
       @RequestParam(value = "limit", defaultValue = "10") @Min(1) @Max(10) Integer limit,
       @RequestParam("authorEmail") String authorEmail) {
-
-    var openTravelsPair = travelService
-        .getAllClosedTravels(PageRequest.of(offset, limit), authorEmail);
-    Page<TravelEntity> openTravels = openTravelsPair.getLeft();
-    var map = openTravelsPair.getRight();
-    var openTravelList = openTravels
+    var closedTravelsPair = travelService
+        .getTravelHistoryByEmail(authorEmail);
+    List<TravelEntity> closedTravels = closedTravelsPair.getLeft();
+    var map = closedTravelsPair.getRight();
+    var openTravelList = closedTravels
         .stream()
-        .map(i -> travelDtoFactory.makeTravelDto(i, map.get(i.getAuthor())))
+        .map(i -> travelDtoFactory.makeTravelDto(i, map.get(i.getId())))
         .collect(Collectors.toList());
-    return new PageImpl<>(openTravelList);
+    return new PageImpl<>(openTravelList.subList(offset, limit));
 
   }
 

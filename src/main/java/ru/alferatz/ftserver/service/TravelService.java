@@ -19,8 +19,10 @@ import ru.alferatz.ftserver.model.TravelDto;
 import ru.alferatz.ftserver.model.UserDto;
 import ru.alferatz.ftserver.repository.TravelRepository;
 import ru.alferatz.ftserver.repository.UserRepository;
+import ru.alferatz.ftserver.repository.UserTravelHistoryRepository;
 import ru.alferatz.ftserver.repository.entity.TravelEntity;
 import ru.alferatz.ftserver.repository.entity.UserEntity;
+import ru.alferatz.ftserver.repository.entity.UserTravelHistoryEntity;
 import ru.alferatz.ftserver.service.utils.TravelServiceUtils;
 import ru.alferatz.ftserver.utils.enums.TravelStatus;
 
@@ -35,6 +37,8 @@ public class TravelService {
   private final TravelRepository travelRepository;
   private final UserRepository userRepository;
   private final ChatRoomRepository chatRoomRepository;
+  private final UserTravelHistoryRepository userTravelHistoryRepository;
+
   private final Set<String> statusesExceptClosed = new HashSet<>(Arrays
       .asList(TravelStatus.CREATED.name(), TravelStatus.IN_PROGRESS.name()));
   private final Set<String> processingStatuses = new HashSet<>(
@@ -214,20 +218,6 @@ public class TravelService {
   }
 
   /**
-   * Получение всех закрытых поездок, метод для истории поездок
-   */
-  public Pair<Page<TravelEntity>, Map<String, List<UserDto>>> getAllClosedTravels(Pageable request,
-      String authorEmail) {
-    Map<String, List<UserDto>> travelIdToUserListMap = new HashMap<>();
-    var openTravels = travelRepository.getAllByTravelStatusInAndAuthorEquals(closedStatus, authorEmail, request);
-    openTravels.forEach(i -> {
-      travelIdToUserListMap.put(i.getAuthor(),
-          travelServiceUtils.getUserDtoListFromUserEntityList(userRepository, i.getId()));
-    });
-    return Pair.of(openTravels, travelIdToUserListMap);
-  }
-
-  /**
    * Проверяем, правильный ли объект пришел и есть ли поездка в базе
    *
    * @param travelDto - пришедший объект с информацией о поездке
@@ -305,5 +295,34 @@ public class TravelService {
     return travelServiceUtils.buildTravelDto(travelEntity, userDtoList);
   }
 
+  /**
+   * Получение всех закрытых поездок, метод для истории поездок
+   */
+  public Pair<List<TravelEntity>, Map<Long, List<UserDto>>> getTravelHistoryByEmail(
+      String userEmail) {
+    Map<Long, List<UserDto>> travelIdToUserListMap = new HashMap<>();
+    List<TravelEntity> closedTravelEntities = new ArrayList<>();
+    // Получаем все поездки, где автором является пользователь, который указан в запросе
+//    var closedTravelsCreatedByUser = travelRepository
+//        .getAllByTravelStatusInAndAuthorEquals(closedStatus, userEmail, request);
+//    closedTravelsCreatedByUser.forEach(i -> {
+//      travelIdToUserListMap.put(i.getAuthor(),
+//          travelServiceUtils.getUserDtoListFromUserEntityList(userRepository, i.getId()));
+//    });
+    UserEntity user = userRepository.getUserEntityByEmail(userEmail).orElse(new UserEntity());
+    var listOfTravelIds = travelServiceUtils
+        .getHistoryTravelIdsByUserId(userTravelHistoryRepository, user.getId());
+    listOfTravelIds.forEach(travelId -> {
+      var travelEntity = travelRepository.findById(travelId).orElse(new TravelEntity());
+      var userDtoList = travelServiceUtils
+          .getUsersFromTravelInHistory(userRepository, userTravelHistoryRepository, travelId);
+      // Удаляем пользователя из списка попутчиков, если он автор поездки
+      userDtoList.removeIf(i -> i.getEmail().equals(travelEntity.getAuthor()));
+      closedTravelEntities.add(travelEntity);
+      travelIdToUserListMap.put(travelId, userDtoList);
+    });
+    //
 
+    return Pair.of(closedTravelEntities, travelIdToUserListMap);
+  }
 }

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
 import ru.alferatz.ftserver.exceptions.InternalServerError;
@@ -11,8 +13,10 @@ import ru.alferatz.ftserver.exceptions.NotFoundException;
 import ru.alferatz.ftserver.model.TravelDto;
 import ru.alferatz.ftserver.model.UserDto;
 import ru.alferatz.ftserver.repository.UserRepository;
+import ru.alferatz.ftserver.repository.UserTravelHistoryRepository;
 import ru.alferatz.ftserver.repository.entity.TravelEntity;
 import ru.alferatz.ftserver.repository.entity.UserEntity;
+import ru.alferatz.ftserver.repository.entity.UserTravelHistoryEntity;
 
 @Component
 public class TravelServiceUtils {
@@ -81,6 +85,27 @@ public class TravelServiceUtils {
         .orElse(Collections.emptyList());
     usersInTravel.forEach(i -> userDtoList.add(new UserDto(i.getUsername(), i.getEmail())));
     return userDtoList;
+  }
+
+  public List<UserDto> getUsersFromTravelInHistory(UserRepository userRepository,
+      UserTravelHistoryRepository historyRepository, Long travelId) {
+    List<UserDto> userDtoList = new ArrayList<>();
+    List<UserTravelHistoryEntity> historyEntities = historyRepository.findAllByTravelId(travelId);
+    historyEntities.forEach(history -> {
+      UserEntity userEntity = userRepository.findById(history.getUserId()).orElse(new UserEntity());
+      userDtoList.add(UserDto.builder()
+          .email(userEntity.getEmail())
+          .username(userEntity.getUsername())
+          .build());
+    });
+    return userDtoList;
+  }
+
+  public List<Long> getHistoryTravelIdsByUserId(UserTravelHistoryRepository historyRepository,
+      Long userId) {
+    return historyRepository.findAllByUserId(userId).stream()
+        .map(i -> i.getTravelId())
+        .collect(Collectors.toList());
   }
 
   public TravelDto buildTravelDto(TravelEntity travelEntity, List<UserDto> userList) {
