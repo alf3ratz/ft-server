@@ -28,4 +28,6 @@ public class UserTravelHistoryEntity {
   private Long userId;
 
   private Long travelId;
+
+  private Long chatId;
 }

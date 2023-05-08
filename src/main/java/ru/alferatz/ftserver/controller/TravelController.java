@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,7 +43,7 @@ public class TravelController {
         .stream()
         .map(i -> travelDtoFactory.makeTravelDto(i, map.get(i.getAuthor())))
         .collect(Collectors.toList());
-    return new PageImpl<>(openTravelList);
+    return new PageImpl<>(openTravelList, PageRequest.of(offset, limit), openTravelList.size());
 
   }
 
@@ -59,7 +60,7 @@ public class TravelController {
         .stream()
         .map(i -> travelDtoFactory.makeTravelDto(i, map.get(i.getId())))
         .collect(Collectors.toList());
-    return new PageImpl<>(openTravelList.subList(offset, limit));
+    return new PageImpl<>(openTravelList, PageRequest.of(offset, limit), closedTravels.size());
 
   }
 
@@ -96,8 +97,18 @@ public class TravelController {
   }
 
   @PostMapping("/deleteTravel")
-  public Long deleteTravel(@RequestParam Long travelId) {
+  public Long deleteTravel(@RequestParam("travelId") Long travelId) {
     return travelService.deleteTravel(travelId);
+  }
+
+  @PostMapping("/startTravel")
+  public TravelDto startTravel(@RequestParam("travelId") Long travelId) {
+    return travelService.startTravel(travelId);
+  }
+
+  @PostMapping("/stopTravel")
+  public TravelDto stopTravel(@RequestParam("travelId") Long travelId) {
+    return travelService.stopTravel(travelId);
   }
 
   @GetMapping("/getTravelById")

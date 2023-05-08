@@ -16,6 +16,9 @@
       <column name="travel_id" type="BIGINT">
         <constraints nullable="true"/>
       </column>
+      <column name="chat_id" type="BIGINT">
+        <constraints nullable="true"/>
+      </column>
     </createTable>
   </changeSet>
 </databaseChangeLog>

@@ -264,6 +264,53 @@ public class TravelService {
     }
   }
 
+  public TravelDto startTravel(Long travelId) {
+    TravelEntity startingTravel = travelRepository.findById(travelId).orElse(new TravelEntity());
+    startingTravel.setTravelStatus(TravelStatus.IN_PROGRESS.name());
+    List<UserDto> userDtoList = travelServiceUtils
+        .getUserDtoListFromUserEntityList(userRepository, travelId);
+    try {
+      travelRepository.save(startingTravel);
+      return travelServiceUtils.buildTravelDto(startingTravel, userDtoList);
+    } catch (RuntimeException e) {
+      throw new InternalServerError("Не удалось изменить статус поездки");
+    } finally {
+      travelRepository.flush();
+    }
+  }
+
+  public TravelDto stopTravel(Long travelId) {
+    TravelEntity closingTravel = travelRepository.findById(travelId).orElse(new TravelEntity());
+    closingTravel.setTravelStatus(TravelStatus.CLOSED.name());
+    List<UserDto> userDtoList = new ArrayList<>();
+    List<UserEntity> usersInTravel = userRepository.getAllByTravelId(travelId)
+        .orElse(Collections.emptyList());
+    usersInTravel.forEach(i -> userDtoList.add(new UserDto(i.getUsername(), i.getEmail())));
+    userDtoList.removeIf(i -> i.getEmail().equals(closingTravel.getAuthor()));
+    // Удаляем связь каждого пользователя с поездкой и чатом
+    usersInTravel.forEach(i -> {
+      travelServiceUtils.unlinkParticipantFromChat(userRepository, i.getEmail());
+      travelServiceUtils
+          .unlinkParticipantToTravel(userRepository, i.getEmail(), closingTravel.getId());
+      userTravelHistoryRepository.save(UserTravelHistoryEntity.builder()
+          .userId(i.getId())
+          .travelId(closingTravel.getId())
+          .chatId(closingTravel.getChatId())
+          .build());
+    });
+
+    try {
+      travelRepository.save(closingTravel);
+      return travelServiceUtils.buildTravelDto(closingTravel, userDtoList);
+    } catch (RuntimeException e) {
+      throw new InternalServerError("Не удалось изменить статус поездки");
+    } finally {
+      travelRepository.flush();
+      userTravelHistoryRepository.flush();
+    }
+  }
+
+
   public TravelDto getTravelById(Long travelId) {
     if (travelId <= 0) {
       throw new BadRequestException("Неверный travelId");
