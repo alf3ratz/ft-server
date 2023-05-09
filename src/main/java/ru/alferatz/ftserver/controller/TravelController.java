@@ -1,5 +1,6 @@
 package ru.alferatz.ftserver.controller;
 
+import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -42,7 +43,7 @@ public class TravelController {
         .stream()
         .map(i -> travelDtoFactory.makeTravelDto(i, map.get(i.getAuthor())))
         .collect(Collectors.toList());
-    return new PageImpl<>(openTravelList);
+    return new PageImpl<>(openTravelList, PageRequest.of(offset, limit), openTravelList.size());
 
   }
 
@@ -51,16 +52,15 @@ public class TravelController {
       @RequestParam(value = "offset", defaultValue = "0") @Min(0) Integer offset,
       @RequestParam(value = "limit", defaultValue = "10") @Min(1) @Max(10) Integer limit,
       @RequestParam("authorEmail") String authorEmail) {
-
-    var openTravelsPair = travelService
-        .getAllClosedTravels(PageRequest.of(offset, limit), authorEmail);
-    Page<TravelEntity> openTravels = openTravelsPair.getLeft();
-    var map = openTravelsPair.getRight();
-    var openTravelList = openTravels
+    var closedTravelsPair = travelService
+        .getTravelHistoryByEmail(authorEmail);
+    List<TravelEntity> closedTravels = closedTravelsPair.getLeft();
+    var map = closedTravelsPair.getRight();
+    var closedTravelList = closedTravels
         .stream()
-        .map(i -> travelDtoFactory.makeTravelDto(i, map.get(i.getAuthor())))
+        .map(i -> travelDtoFactory.makeTravelDto(i, map.get(i.getId())))
         .collect(Collectors.toList());
-    return new PageImpl<>(openTravelList);
+    return new PageImpl<>(closedTravelList, PageRequest.of(offset, limit), closedTravelList.size());
 
   }
 
@@ -97,8 +97,18 @@ public class TravelController {
   }
 
   @PostMapping("/deleteTravel")
-  public Long deleteTravel(@RequestParam Long travelId) {
+  public Long deleteTravel(@RequestParam("travelId") Long travelId) {
     return travelService.deleteTravel(travelId);
+  }
+
+  @PostMapping("/startTravel")
+  public TravelDto startTravel(@RequestParam("travelId") Long travelId) {
+    return travelService.startTravel(travelId);
+  }
+
+  @PostMapping("/stopTravel")
+  public TravelDto stopTravel(@RequestParam("travelId") Long travelId) {
+    return travelService.stopTravel(travelId);
   }
 
   @GetMapping("/getTravelById")

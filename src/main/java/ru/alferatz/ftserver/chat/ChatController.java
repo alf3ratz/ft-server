@@ -50,4 +50,9 @@ public class ChatController {
 //    }
     return res;
   }
+
+  @GetMapping("/getHistoryMessagesByChat")
+  public List<ChatMessageDto> getHistoryMessagesByChat(@RequestParam("chatId") Long chatId) {
+    return chatService.getMessageByChat(chatId);
+  }
 }

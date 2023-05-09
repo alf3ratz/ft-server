@@ -17,8 +17,10 @@ import ru.alferatz.ftserver.model.TravelDto;
 import ru.alferatz.ftserver.model.UserDto;
 import ru.alferatz.ftserver.repository.TravelRepository;
 import ru.alferatz.ftserver.repository.UserRepository;
+import ru.alferatz.ftserver.repository.UserTravelHistoryRepository;
 import ru.alferatz.ftserver.repository.entity.TravelEntity;
 import ru.alferatz.ftserver.repository.entity.UserEntity;
+import ru.alferatz.ftserver.repository.entity.UserTravelHistoryEntity;
 import ru.alferatz.ftserver.service.utils.TravelServiceUtils;
 import ru.alferatz.ftserver.utils.enums.TravelStatus;
 
@@ -33,6 +35,8 @@ public class TravelService {
   private final TravelRepository travelRepository;
   private final UserRepository userRepository;
   private final ChatRoomRepository chatRoomRepository;
+  private final UserTravelHistoryRepository userTravelHistoryRepository;
+
   private final Set<String> statusesExceptClosed = new HashSet<>(Arrays
       .asList(TravelStatus.CREATED.name(), TravelStatus.IN_PROGRESS.name()));
   private final Set<String> processingStatuses = new HashSet<>(
@@ -114,9 +118,10 @@ public class TravelService {
     Map<String, List<UserDto>> travelIdToUserListMap = new HashMap<>();
     var openTravels = travelRepository.getAllByTravelStatusIn(processingStatuses, request);
     openTravels.forEach(i -> {
-      travelIdToUserListMap.put(i.getAuthor(),
-          travelServiceUtils
-              .getUserDtoListFromUserEntityList(userRepository, i.getId(), i.getAuthor()));
+      var participants = travelServiceUtils
+          .getUserDtoListFromUserEntityList(userRepository, i.getId(), i.getAuthor());
+      participants.removeIf(j -> j.getEmail().equals(i.getAuthor()));
+      travelIdToUserListMap.put(i.getAuthor(), participants);
     });
     return Pair.of(openTravels, travelIdToUserListMap);
   }
@@ -154,6 +159,7 @@ public class TravelService {
     List<UserDto> userDtoList = travelServiceUtils
         .getUserDtoListFromUserEntityList(userRepository, travelEntity.getId(),
             travelEntity.getAuthor());
+    userDtoList.removeIf(i -> i.getEmail().equals(travelEntity.getAuthor()));
     travelEntity.setCountOfParticipants(travelEntity.getCountOfParticipants() + 1);
     try {
       travelRepository.save(travelEntity);
@@ -181,6 +187,7 @@ public class TravelService {
     List<UserDto> userDtoList = travelServiceUtils
         .getUserDtoListFromUserEntityList(userRepository, travelEntity.getId(),
             travelEntity.getAuthor());
+    userDtoList.removeIf(i -> i.getEmail().equals(travelEntity.getAuthor()));
     travelEntity.setCountOfParticipants(travelEntity.getCountOfParticipants() - 1);
     try {
       travelRepository.save(travelEntity);
@@ -197,6 +204,7 @@ public class TravelService {
     List<UserDto> userDtoList = travelServiceUtils
         .getUserDtoListFromUserEntityList(userRepository, travelEntity.getId(),
             travelEntity.getAuthor());
+    userDtoList.removeIf(i -> i.getEmail().equals(travelEntity.getAuthor()));
     if (travelServiceUtils.isTravelChanged(travelEntity, travelDto)) {
       travelEntity.setCountOfParticipants(travelDto.getCountOfParticipants());
       travelEntity.setCountOfParticipants(travelDto.getCountOfParticipants());
@@ -213,22 +221,6 @@ public class TravelService {
       }
     }
     return travelServiceUtils.buildTravelDto(travelEntity, userDtoList);
-  }
-
-  /**
-   * Получение всех закрытых поездок, метод для истории поездок
-   */
-  public Pair<Page<TravelEntity>, Map<String, List<UserDto>>> getAllClosedTravels(Pageable request,
-      String authorEmail) {
-    Map<String, List<UserDto>> travelIdToUserListMap = new HashMap<>();
-    var openTravels = travelRepository
-        .getAllByTravelStatusInAndAuthorEquals(closedStatus, authorEmail, request);
-    openTravels.forEach(i -> {
-      travelIdToUserListMap.put(i.getAuthor(),
-          travelServiceUtils
-              .getUserDtoListFromUserEntityList(userRepository, i.getId(), i.getAuthor()));
-    });
-    return Pair.of(openTravels, travelIdToUserListMap);
   }
 
   /**
@@ -278,6 +270,53 @@ public class TravelService {
     }
   }
 
+  public TravelDto startTravel(Long travelId) {
+    TravelEntity startingTravel = travelRepository.findById(travelId).orElse(new TravelEntity());
+    startingTravel.setTravelStatus(TravelStatus.IN_PROGRESS.name());
+    List<UserDto> userDtoList = travelServiceUtils
+        .getUserDtoListFromUserEntityList(userRepository, travelId, startingTravel.getAuthor());
+    try {
+      travelRepository.save(startingTravel);
+      return travelServiceUtils.buildTravelDto(startingTravel, userDtoList);
+    } catch (RuntimeException e) {
+      throw new InternalServerError("Не удалось изменить статус поездки");
+    } finally {
+      travelRepository.flush();
+    }
+  }
+
+  public TravelDto stopTravel(Long travelId) {
+    TravelEntity closingTravel = travelRepository.findById(travelId).orElse(new TravelEntity());
+    closingTravel.setTravelStatus(TravelStatus.CLOSED.name());
+    List<UserDto> userDtoList = new ArrayList<>();
+    List<UserEntity> usersInTravel = userRepository.getAllByTravelId(travelId)
+        .orElse(Collections.emptyList());
+    usersInTravel.forEach(i -> userDtoList.add(new UserDto(i.getUsername(), i.getEmail())));
+    userDtoList.removeIf(i -> i.getEmail().equals(closingTravel.getAuthor()));
+    // Удаляем связь каждого пользователя с поездкой и чатом
+    usersInTravel.forEach(i -> {
+      travelServiceUtils.unlinkParticipantFromChat(userRepository, i.getEmail());
+      travelServiceUtils
+          .unlinkParticipantToTravel(userRepository, i.getEmail(), closingTravel.getId());
+      userTravelHistoryRepository.save(UserTravelHistoryEntity.builder()
+          .userId(i.getId())
+          .travelId(closingTravel.getId())
+          .chatId(closingTravel.getChatId())
+          .build());
+    });
+
+    try {
+      travelRepository.save(closingTravel);
+      return travelServiceUtils.buildTravelDto(closingTravel, userDtoList);
+    } catch (RuntimeException e) {
+      throw new InternalServerError("Не удалось изменить статус поездки");
+    } finally {
+      travelRepository.flush();
+      userTravelHistoryRepository.flush();
+    }
+  }
+
+
   public TravelDto getTravelById(Long travelId) {
     if (travelId <= 0) {
       throw new BadRequestException("Неверный travelId");
@@ -310,6 +349,37 @@ public class TravelService {
     return travelServiceUtils.buildTravelDto(travelEntity, userDtoList);
   }
 
+  /**
+   * Получение всех закрытых поездок, метод для истории поездок
+   */
+  public Pair<List<TravelEntity>, Map<Long, List<UserDto>>> getTravelHistoryByEmail(
+      String userEmail) {
+    Map<Long, List<UserDto>> travelIdToUserListMap = new HashMap<>();
+    List<TravelEntity> closedTravelEntities = new ArrayList<>();
+    // Получаем все поездки, где автором является пользователь, который указан в запросе
+//    var closedTravelsCreatedByUser = travelRepository
+//        .getAllByTravelStatusInAndAuthorEquals(closedStatus, userEmail, request);
+//    closedTravelsCreatedByUser.forEach(i -> {
+//      travelIdToUserListMap.put(i.getAuthor(),
+//          travelServiceUtils.getUserDtoListFromUserEntityList(userRepository, i.getId()));
+//    });
+    UserEntity user = userRepository.getUserEntityByEmail(userEmail).orElse(new UserEntity());
+    var listOfTravelIds = travelServiceUtils
+        .getHistoryTravelIdsByUserId(userTravelHistoryRepository, user.getId());
+    listOfTravelIds.forEach(travelId -> {
+      var travelEntity = travelRepository.findById(travelId).orElse(new TravelEntity());
+      var userDtoList = travelServiceUtils
+          .getUsersFromTravelInHistory(userRepository, userTravelHistoryRepository, travelId);
+      // Удаляем пользователя из списка попутчиков, если он автор поездки
+      userDtoList.removeIf(i -> i.getEmail().equals(travelEntity.getAuthor()));
+      closedTravelEntities.add(travelEntity);
+      travelIdToUserListMap.put(travelId, userDtoList);
+    });
+    //
+
+    return Pair.of(closedTravelEntities, travelIdToUserListMap);
+  }
+
   public TravelDto setLeadershipToParticipant(Long travelId, String participantEmail) {
     TravelEntity travelEntity = travelRepository.findById(travelId).orElse(new TravelEntity());
     String authorEmail = travelEntity.getAuthor();
@@ -328,5 +398,4 @@ public class TravelService {
       travelRepository.flush();
     }
   }
-
 }
