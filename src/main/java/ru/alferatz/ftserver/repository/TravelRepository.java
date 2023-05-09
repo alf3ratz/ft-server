@@ -3,6 +3,7 @@ package ru.alferatz.ftserver.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import ru.alferatz.ftserver.repository.entity.TravelEntity;
 
@@ -31,7 +32,8 @@ public interface TravelRepository extends JpaRepository<TravelEntity, Long> {
 
   Integer deleteTravelEntityById(Long id);
 
+  @Modifying
   @Query("update TravelEntity travel set travel.travelStatus = ?2 where travel.id = ?1")
-  Optional<TravelEntity> setStatusToTravel(Long travelId, String status);
+  void setStatusToTravel(Long travelId, String status);
 }
 

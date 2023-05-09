@@ -257,11 +257,8 @@ public class TravelService {
           .unlinkParticipantToTravel(userRepository, i.getEmail(), travelEntity.getId());
     });
     try {
-      var closedTravel = travelRepository.setStatusToTravel(travelId, TravelStatus.CLOSED.name());
-      //var deletedTravelCount = travelRepository.deleteTravelEntityById(travelId);
-      if (closedTravel.isEmpty()) {
-        throw new NotFoundException("Can not delete travel");
-      }
+      travelEntity.setTravelStatus(TravelStatus.CLOSED.name());
+      travelRepository.save(travelEntity);
       return travelId;
     } catch (RuntimeException e) {
       throw new InternalServerError("Не удалось удалить поездку");
@@ -328,6 +325,7 @@ public class TravelService {
     List<UserDto> userDtoList = travelServiceUtils
         .getUserDtoListFromUserEntityList(userRepository, travelEntity.getId(),
             travelEntity.getAuthor());
+    userDtoList.removeIf(i -> i.getEmail().equals(travelEntity.getAuthor()));
     return travelServiceUtils.buildTravelDto(travelEntity, userDtoList);
   }
 
@@ -346,6 +344,7 @@ public class TravelService {
     }
     List<UserDto> userDtoList = travelServiceUtils
         .getUserDtoListFromUserEntityList(userRepository, travelEntity.getId(), authorEmail);
+    userDtoList.removeIf(i -> i.getEmail().equals(travelEntity.getAuthor()));
     return travelServiceUtils.buildTravelDto(travelEntity, userDtoList);
   }
 
