@@ -56,11 +56,11 @@ public class TravelController {
         .getTravelHistoryByEmail(authorEmail);
     List<TravelEntity> closedTravels = closedTravelsPair.getLeft();
     var map = closedTravelsPair.getRight();
-    var openTravelList = closedTravels
+    var closedTravelList = closedTravels
         .stream()
         .map(i -> travelDtoFactory.makeTravelDto(i, map.get(i.getId())))
         .collect(Collectors.toList());
-    return new PageImpl<>(openTravelList, PageRequest.of(offset, limit), closedTravels.size());
+    return new PageImpl<>(closedTravelList, PageRequest.of(offset, limit), closedTravelList.size());
 
   }
 

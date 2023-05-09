@@ -120,8 +120,9 @@ public class TravelService {
     Map<String, List<UserDto>> travelIdToUserListMap = new HashMap<>();
     var openTravels = travelRepository.getAllByTravelStatusIn(processingStatuses, request);
     openTravels.forEach(i -> {
-      travelIdToUserListMap.put(i.getAuthor(),
-          travelServiceUtils.getUserDtoListFromUserEntityList(userRepository, i.getId()));
+      var participants = travelServiceUtils.getUserDtoListFromUserEntityList(userRepository, i.getId());
+      participants.removeIf(j->j.getEmail().equals(i.getAuthor()));
+      travelIdToUserListMap.put(i.getAuthor(),participants);
     });
     return Pair.of(openTravels, travelIdToUserListMap);
   }
@@ -158,6 +159,7 @@ public class TravelService {
 
     List<UserDto> userDtoList = travelServiceUtils
         .getUserDtoListFromUserEntityList(userRepository, travelEntity.getId());
+    userDtoList.removeIf(i->i.getEmail().equals(travelEntity.getAuthor()));
     travelEntity.setCountOfParticipants(travelEntity.getCountOfParticipants() + 1);
     try {
       travelRepository.save(travelEntity);
@@ -184,6 +186,7 @@ public class TravelService {
 
     List<UserDto> userDtoList = travelServiceUtils
         .getUserDtoListFromUserEntityList(userRepository, travelEntity.getId());
+    userDtoList.removeIf(i->i.getEmail().equals(travelEntity.getAuthor()));
     travelEntity.setCountOfParticipants(travelEntity.getCountOfParticipants() - 1);
     try {
       travelRepository.save(travelEntity);
@@ -199,6 +202,7 @@ public class TravelService {
     TravelEntity travelEntity = checkTravel(travelDto);
     List<UserDto> userDtoList = travelServiceUtils
         .getUserDtoListFromUserEntityList(userRepository, travelEntity.getId());
+    userDtoList.removeIf(i->i.getEmail().equals(travelEntity.getAuthor()));
     if (travelServiceUtils.isTravelChanged(travelEntity, travelDto)) {
       travelEntity.setCountOfParticipants(travelDto.getCountOfParticipants());
       travelEntity.setCountOfParticipants(travelDto.getCountOfParticipants());
