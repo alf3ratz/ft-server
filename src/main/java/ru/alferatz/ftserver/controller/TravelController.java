@@ -25,7 +25,7 @@ import ru.alferatz.ftserver.service.TravelService;
 @RequestMapping("/api/travel")
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin
+@CrossOrigin(origins = "https://ftapp-aapetropavlovskiy.b4a.run")
 public class TravelController {
 
   private final TravelService travelService;
