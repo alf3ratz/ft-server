@@ -17,6 +17,13 @@ public class UserService {
   private final UserRepository userRepository;
 
   public UserDto addUserToSystem(AddUserRequest request) {
+    UserEntity existUser = userRepository.getUserEntityByEmail(request.getUserEmail()).orElse(null);
+    if (existUser != null) {
+      return UserDto.builder()
+          .email(existUser.getEmail())
+          .username(existUser.getUsername())
+          .build();
+    }
     UserEntity userEntity = UserEntity.builder()
         .username(request.getUsername())
         .email(request.getUserEmail())
