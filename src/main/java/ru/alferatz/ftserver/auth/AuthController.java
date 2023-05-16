@@ -16,7 +16,7 @@ public class AuthController {
   private final AuthService authService;
 
   @GetMapping("/hse_redirect")
-  public void redirect(@RequestParam String token) {
+  public void redirect(@RequestParam("code") String token) {
     authService.redirect(token);
   }
 
