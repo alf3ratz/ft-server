@@ -2,6 +2,8 @@ package ru.alferatz.ftserver.auth;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -23,6 +25,7 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoderFactory;
+import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 
 @Configuration
 public class SecurityConfig {
@@ -83,13 +86,14 @@ public class SecurityConfig {
     idTokenDecoderFactory.setJwsAlgorithmResolver(clientRegistration -> MacAlgorithm.HS256);
     return idTokenDecoderFactory;
   }
-//  @Autowired
-//  private ResourceServerProperties sso;
-//
-//  @Bean
-//  public ResourceServerTokenServices userInfoTokenServices() {
-//    return new AdfsUserInfoTokenServices(sso.getUserInfoUri(), sso.getClientId());
-//  }
+
+  @Autowired
+  private ResourceServerProperties sso;
+
+  @Bean
+  public ResourceServerTokenServices userInfoTokenServices() {
+    return new AdfsUserInfoTokenServices(sso.getUserInfoUri(), sso.getClientId());
+  }
 
   private ClientRegistration googleClientRegistration() {
 
