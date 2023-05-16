@@ -25,13 +25,13 @@ spring:
           hse:
             clientId: fe0df921-754d-45e8-8d48-1fcef2d91df8
             authorization-grant-type: authorization_code
-            redirectUri: https://ftapp.herokuapp.com/auth/hse_redirect
-            tokenUri: https://auth.hse.ru/adfs/oauth2/authorize
+            redirectUri: https://www.ft-app.online/auth/hse_redirect
+            authorizationUri: https://auth.hse.ru/adfs/oauth2/authorize
+            #            tokenUri: https://auth.hse.ru/adfs/oauth2/authorize
             clientAuthenticationScheme: form
         provider:
           hse:
             tokenUri: https://auth.hse.ru/adfs/oauth2/token
-            authorizationUri: https://auth.hse.ru/adfs/oauth2/authorize
             userInfoUri: https://auth.hse.ru/adfs/oauth2/token
 #      resource:
 #        userInfoUri: https://[adfs domain]/adfs/oauth2/token
