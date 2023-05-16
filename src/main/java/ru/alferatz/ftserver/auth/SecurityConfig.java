@@ -77,12 +77,12 @@ public class SecurityConfig {
     return new InMemoryClientRegistrationRepository(this.googleClientRegistration());
   }
 
-  //  @Bean
-//  public JwtDecoderFactory<ClientRegistration> idTokenDecoderFactory() {
-//    OidcIdTokenDecoderFactory idTokenDecoderFactory = new OidcIdTokenDecoderFactory();
-//    idTokenDecoderFactory.setJwsAlgorithmResolver(clientRegistration -> MacAlgorithm.HS256);
-//    return idTokenDecoderFactory;
-//  }
+  @Bean
+  public JwtDecoderFactory<ClientRegistration> idTokenDecoderFactory() {
+    OidcIdTokenDecoderFactory idTokenDecoderFactory = new OidcIdTokenDecoderFactory();
+    idTokenDecoderFactory.setJwsAlgorithmResolver(clientRegistration -> MacAlgorithm.HS256);
+    return idTokenDecoderFactory;
+  }
 //  @Autowired
 //  private ResourceServerProperties sso;
 //
@@ -113,24 +113,24 @@ public class SecurityConfig {
         .build();
   }
 
-//  @Bean
-//  public OAuth2AuthorizedClientManager authorizedClientManager(
-//      ClientRegistrationRepository clientRegistrationRepository,
-//      OAuth2AuthorizedClientRepository authorizedClientRepository) {
-//
-//    OAuth2AuthorizedClientProvider authorizedClientProvider =
-//        OAuth2AuthorizedClientProviderBuilder.builder()
-//            .authorizationCode()
-//            .refreshToken()
-//            .clientCredentials()
-//            .password()
-//            .build();
-//
-//    DefaultOAuth2AuthorizedClientManager authorizedClientManager =
-//        new DefaultOAuth2AuthorizedClientManager(
-//            clientRegistrationRepository, authorizedClientRepository);
-//    authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
-//
-//    return authorizedClientManager;
-//  }
+  @Bean
+  public OAuth2AuthorizedClientManager authorizedClientManager(
+      ClientRegistrationRepository clientRegistrationRepository,
+      OAuth2AuthorizedClientRepository authorizedClientRepository) {
+
+    OAuth2AuthorizedClientProvider authorizedClientProvider =
+        OAuth2AuthorizedClientProviderBuilder.builder()
+            .authorizationCode()
+            .refreshToken()
+            .clientCredentials()
+            .password()
+            .build();
+
+    DefaultOAuth2AuthorizedClientManager authorizedClientManager =
+        new DefaultOAuth2AuthorizedClientManager(
+            clientRegistrationRepository, authorizedClientRepository);
+    authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
+
+    return authorizedClientManager;
+  }
 }
