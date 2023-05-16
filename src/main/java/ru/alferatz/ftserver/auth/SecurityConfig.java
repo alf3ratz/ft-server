@@ -10,10 +10,18 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 //import org.springframework.security.oauth2.client.registration.ClientRegistration;
 //import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 //import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProvider;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder;
+import org.springframework.security.oauth2.client.oidc.authentication.OidcIdTokenDecoderFactory;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.JwtDecoderFactory;
 
 @Configuration
 public class SecurityConfig {
@@ -23,9 +31,17 @@ public class SecurityConfig {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+//      http
+//          .authorizeRequests(authorizeRequests ->
+//              authorizeRequests
+//                  .anyRequest().authenticated()
+//          )
+//          .oauth2Login(
+//              withDefaults()
+//          );
       http
-//          .oauth2Login(oauth2Login ->
-//              oauth2Login
+          .oauth2Login(oauth2Login ->
+              oauth2Login
 //                  .clientRegistrationRepository(this.clientRegistrationRepository())
 //                  .authorizedClientRepository(this.authorizedClientRepository())
 //                  .authorizedClientService(this.authorizedClientService())
@@ -36,33 +52,35 @@ public class SecurityConfig {
 //                          .authorizationRequestRepository(this.authorizationRequestRepository())
 //                          .authorizationRequestResolver(this.authorizationRequestResolver())
 //                  )
-//                  .redirectionEndpoint(redirectionEndpoint ->
-//                      redirectionEndpoint
-//                          .baseUri(this.authorizationResponseBaseUri())
-//                  )
+                  .redirectionEndpoint(redirectionEndpoint ->
+                      redirectionEndpoint
+                          .baseUri("/auth/hse_redirect")
+                  )
 //                  .tokenEndpoint(tokenEndpoint ->
 //                      tokenEndpoint
 //                          .accessTokenResponseClient(this.accessTokenResponseClient())
-//                  ));
-          .authorizeRequests(authorizeRequests ->
-              authorizeRequests
-                  .anyRequest().authenticated()
-          )
-          .oauth2Login(
-//              oauth2Login->
-//                  oauth2Login
-//                  .redirectionEndpoint(redirectionEndpoint ->
-//                      redirectionEndpoint
-//                          .baseUri("/api/auth/redirect_hse")
-//                    )
-              withDefaults()
-          );//(withDefaults());
+//                  )
+//                  .userInfoEndpoint(userInfoEndpoint ->
+//                      userInfoEndpoint
+//                          .userAuthoritiesMapper(this.userAuthoritiesMapper())
+//                          .userService(this.oauth2UserService())
+//                          .oidcUserService(this.oidcUserService())
+//                          .customUserType(GitHubOAuth2User.class, "github")
+//                  )
+          );
     }
   }
 
   @Bean
   public ClientRegistrationRepository clientRegistrationRepository() {
     return new InMemoryClientRegistrationRepository(this.googleClientRegistration());
+  }
+
+  @Bean
+  public JwtDecoderFactory<ClientRegistration> idTokenDecoderFactory() {
+    OidcIdTokenDecoderFactory idTokenDecoderFactory = new OidcIdTokenDecoderFactory();
+    idTokenDecoderFactory.setJwsAlgorithmResolver(clientRegistration -> MacAlgorithm.HS256);
+    return idTokenDecoderFactory;
   }
 
   private ClientRegistration googleClientRegistration() {
@@ -83,5 +101,26 @@ public class SecurityConfig {
         //.jwkSetUri("https://www.googleapis.com/oauth2/v3/certs")
         .clientName("hse")
         .build();
+  }
+
+  @Bean
+  public OAuth2AuthorizedClientManager authorizedClientManager(
+      ClientRegistrationRepository clientRegistrationRepository,
+      OAuth2AuthorizedClientRepository authorizedClientRepository) {
+
+    OAuth2AuthorizedClientProvider authorizedClientProvider =
+        OAuth2AuthorizedClientProviderBuilder.builder()
+            .authorizationCode()
+            .refreshToken()
+            .clientCredentials()
+            .password()
+            .build();
+
+    DefaultOAuth2AuthorizedClientManager authorizedClientManager =
+        new DefaultOAuth2AuthorizedClientManager(
+            clientRegistrationRepository, authorizedClientRepository);
+    authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
+
+    return authorizedClientManager;
   }
 }
