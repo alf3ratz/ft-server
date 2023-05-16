@@ -31,17 +31,17 @@ public class SecurityConfig {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-//      http
-//          .authorizeRequests(authorizeRequests ->
-//              authorizeRequests
-//                  .anyRequest().authenticated()
-//          )
-//          .oauth2Login(
-//              withDefaults()
-//          );
       http
-          .oauth2Login(oauth2Login ->
-              oauth2Login
+          .authorizeRequests(authorizeRequests ->
+              authorizeRequests
+                  .anyRequest().authenticated()
+          )
+          .oauth2Login(
+              withDefaults()
+          );
+//      http
+//          .oauth2Login(oauth2Login ->
+//              oauth2Login
 //                  .clientRegistrationRepository(this.clientRegistrationRepository())
 //                  .authorizedClientRepository(this.authorizedClientRepository())
 //                  .authorizedClientService(this.authorizedClientService())
@@ -52,10 +52,10 @@ public class SecurityConfig {
 //                          .authorizationRequestRepository(this.authorizationRequestRepository())
 //                          .authorizationRequestResolver(this.authorizationRequestResolver())
 //                  )
-                  .redirectionEndpoint(redirectionEndpoint ->
-                      redirectionEndpoint
-                          .baseUri("/auth/hse_redirect")
-                  )
+//                  .redirectionEndpoint(redirectionEndpoint ->
+//                      redirectionEndpoint
+//                          .baseUri("/auth/hse_redirect")
+//                  )
 //                  .tokenEndpoint(tokenEndpoint ->
 //                      tokenEndpoint
 //                          .accessTokenResponseClient(this.accessTokenResponseClient())
@@ -67,7 +67,7 @@ public class SecurityConfig {
 //                          .oidcUserService(this.oidcUserService())
 //                          .customUserType(GitHubOAuth2User.class, "github")
 //                  )
-          );
+//          );
     }
   }
 
@@ -76,12 +76,12 @@ public class SecurityConfig {
     return new InMemoryClientRegistrationRepository(this.googleClientRegistration());
   }
 
-  @Bean
-  public JwtDecoderFactory<ClientRegistration> idTokenDecoderFactory() {
-    OidcIdTokenDecoderFactory idTokenDecoderFactory = new OidcIdTokenDecoderFactory();
-    idTokenDecoderFactory.setJwsAlgorithmResolver(clientRegistration -> MacAlgorithm.HS256);
-    return idTokenDecoderFactory;
-  }
+//  @Bean
+//  public JwtDecoderFactory<ClientRegistration> idTokenDecoderFactory() {
+//    OidcIdTokenDecoderFactory idTokenDecoderFactory = new OidcIdTokenDecoderFactory();
+//    idTokenDecoderFactory.setJwsAlgorithmResolver(clientRegistration -> MacAlgorithm.HS256);
+//    return idTokenDecoderFactory;
+//  }
 
   private ClientRegistration googleClientRegistration() {
 
@@ -103,24 +103,24 @@ public class SecurityConfig {
         .build();
   }
 
-  @Bean
-  public OAuth2AuthorizedClientManager authorizedClientManager(
-      ClientRegistrationRepository clientRegistrationRepository,
-      OAuth2AuthorizedClientRepository authorizedClientRepository) {
-
-    OAuth2AuthorizedClientProvider authorizedClientProvider =
-        OAuth2AuthorizedClientProviderBuilder.builder()
-            .authorizationCode()
-            .refreshToken()
-            .clientCredentials()
-            .password()
-            .build();
-
-    DefaultOAuth2AuthorizedClientManager authorizedClientManager =
-        new DefaultOAuth2AuthorizedClientManager(
-            clientRegistrationRepository, authorizedClientRepository);
-    authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
-
-    return authorizedClientManager;
-  }
+//  @Bean
+//  public OAuth2AuthorizedClientManager authorizedClientManager(
+//      ClientRegistrationRepository clientRegistrationRepository,
+//      OAuth2AuthorizedClientRepository authorizedClientRepository) {
+//
+//    OAuth2AuthorizedClientProvider authorizedClientProvider =
+//        OAuth2AuthorizedClientProviderBuilder.builder()
+//            .authorizationCode()
+//            .refreshToken()
+//            .clientCredentials()
+//            .password()
+//            .build();
+//
+//    DefaultOAuth2AuthorizedClientManager authorizedClientManager =
+//        new DefaultOAuth2AuthorizedClientManager(
+//            clientRegistrationRepository, authorizedClientRepository);
+//    authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
+//
+//    return authorizedClientManager;
+//  }
 }
