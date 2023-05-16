@@ -7,6 +7,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+//import org.springframework.security.oauth2.client.registration.ClientRegistration;
+//import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+//import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
@@ -70,7 +73,7 @@ public class SecurityConfig {
         //.clientAuthenticationMethod(ClientAuthenticationMethod)
         //.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
         .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-        .redirectUri("http://localhost:8080/auth/hse_redirect")
+        .redirectUri("https://www.ft-app.online/auth/hse_redirect")
         //.redirectUriTemplate("https://ftapp.herokuapp.com/auth/hse_redirect")
         //.scope("openid", "profile", "email", "address", "phone")
         .authorizationUri("https://auth.hse.ru/adfs/oauth2/authorize")
