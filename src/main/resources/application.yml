@@ -9,3 +9,29 @@ spring:
 #    url: jdbc:postgresql://ec2-54-80-122-11.compute-1.amazonaws.com:5432/d2duq9ekdqf40t
 #    username: njhcjjhszaojaq
 #    password: 66a1175a8f4e85e5a8f2e347a3f4596c52e8792920d9d986c43171f5aa0db70b
+  security:
+    oauth2:
+      client:
+
+#        clientId: [ client id setup with ADFS ]
+#        userAuthorizationUri: https://[adfs domain]/adfs/oauth2/authorize?resource=[MyRelyingPartyTrust]
+#        accessTokenUri: https://[adfs domain]/adfs/oauth2/token
+#        tokenName: code
+#        authenticationScheme: query
+#        clientAuthenticationScheme: form
+#        grant-type: authorization_code
+#        red
+        registration:
+          hse:
+            clientId: fe0df921-754d-45e8-8d48-1fcef2d91df8
+            authorization-grant-type: authorization_code
+            redirectUri: https://ftapp.herokuapp.com/auth/hse_redirect
+            tokenUri: https://auth.hse.ru/adfs/oauth2/authorize
+            clientAuthenticationScheme: form
+        provider:
+          hse:
+            tokenUri: https://auth.hse.ru/adfs/oauth2/token
+            authorizationUri: https://auth.hse.ru/adfs/oauth2/authorize
+            userInfoUri: https://auth.hse.ru/adfs/oauth2/token
+#      resource:
+#        userInfoUri: https://[adfs domain]/adfs/oauth2/token

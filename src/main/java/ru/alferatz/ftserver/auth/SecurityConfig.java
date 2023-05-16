@@ -75,10 +75,10 @@ public class SecurityConfig {
     }
   }
 
-  @Bean
-  public ClientRegistrationRepository clientRegistrationRepository() {
-    return new InMemoryClientRegistrationRepository(this.googleClientRegistration());
-  }
+//  @Bean
+//  public ClientRegistrationRepository clientRegistrationRepository() {
+//    return new InMemoryClientRegistrationRepository(this.googleClientRegistration());
+//  }
 
   @Bean
   public JwtDecoderFactory<ClientRegistration> idTokenDecoderFactory() {
@@ -95,27 +95,27 @@ public class SecurityConfig {
     return new AdfsUserInfoTokenServices(sso.getUserInfoUri(), sso.getClientId());
   }
 
-  private ClientRegistration googleClientRegistration() {
-
-    return ClientRegistration.withRegistrationId("hse")
-        .clientId("fe0df921-754d-45e8-8d48-1fcef2d91df8")
-        //.clientSecret("google-client-secret")
-        //.clientAuthenticationMethod(ClientAuthenticationMethod)
-        //.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-        .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-        .redirectUri("https://www.ft-app.online/auth/hse_redirect")
-        //.redirectUriTemplate("https://ftapp.herokuapp.com/auth/hse_redirect")
-        //.scope("openid", "profile", "email", "address", "phone")
-        .authorizationUri("https://auth.hse.ru/adfs/oauth2/authorize")
-        .tokenUri("https://auth.hse.ru/adfs/oauth2/token")
-        // .clientAuthenticationMethod(ClientAuthenticationMethod.PRIVATE_KEY_JWT)
-        .userInfoUri("https://auth.hse.ru/adfs/oauth2/token")
-        //.userInfoUri("https://www.googleapis.com/oauth2/v3/userinfo")
-        //.userNameAttributeName(IdTokenClaimNames.SUB)
-        //.jwkSetUri("https://www.googleapis.com/oauth2/v3/certs")
-        .clientName("hse")
-        .build();
-  }
+//  private ClientRegistration googleClientRegistration() {
+//
+//    return ClientRegistration.withRegistrationId("hse")
+//        .clientId("fe0df921-754d-45e8-8d48-1fcef2d91df8")
+//        //.clientSecret("google-client-secret")
+//        //.clientAuthenticationMethod(ClientAuthenticationMethod)
+//        //.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+//        .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+//        .redirectUri("https://www.ft-app.online/auth/hse_redirect")
+//        //.redirectUriTemplate("https://ftapp.herokuapp.com/auth/hse_redirect")
+//        //.scope("openid", "profile", "email", "address", "phone")
+//        .authorizationUri("https://auth.hse.ru/adfs/oauth2/authorize")
+//        .tokenUri("https://auth.hse.ru/adfs/oauth2/token")
+//        // .clientAuthenticationMethod(ClientAuthenticationMethod.PRIVATE_KEY_JWT)
+//        .userInfoUri("https://auth.hse.ru/adfs/oauth2/token")
+//        //.userInfoUri("https://www.googleapis.com/oauth2/v3/userinfo")
+//        //.userNameAttributeName(IdTokenClaimNames.SUB)
+//        //.jwkSetUri("https://www.googleapis.com/oauth2/v3/certs")
+//        .clientName("hse")
+//        .build();
+//  }
 
   @Bean
   public OAuth2AuthorizedClientManager authorizedClientManager(
