@@ -20,6 +20,7 @@ import org.springframework.security.oauth2.client.registration.InMemoryClientReg
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoderFactory;
 
@@ -76,11 +77,18 @@ public class SecurityConfig {
     return new InMemoryClientRegistrationRepository(this.googleClientRegistration());
   }
 
-//  @Bean
+  //  @Bean
 //  public JwtDecoderFactory<ClientRegistration> idTokenDecoderFactory() {
 //    OidcIdTokenDecoderFactory idTokenDecoderFactory = new OidcIdTokenDecoderFactory();
 //    idTokenDecoderFactory.setJwsAlgorithmResolver(clientRegistration -> MacAlgorithm.HS256);
 //    return idTokenDecoderFactory;
+//  }
+//  @Autowired
+//  private ResourceServerProperties sso;
+//
+//  @Bean
+//  public ResourceServerTokenServices userInfoTokenServices() {
+//    return new AdfsUserInfoTokenServices(sso.getUserInfoUri(), sso.getClientId());
 //  }
 
   private ClientRegistration googleClientRegistration() {
@@ -96,6 +104,8 @@ public class SecurityConfig {
         //.scope("openid", "profile", "email", "address", "phone")
         .authorizationUri("https://auth.hse.ru/adfs/oauth2/authorize")
         .tokenUri("https://auth.hse.ru/adfs/oauth2/token")
+        // .clientAuthenticationMethod(ClientAuthenticationMethod.PRIVATE_KEY_JWT)
+        .userInfoUri("https://auth.hse.ru/adfs/oauth2/token")
         //.userInfoUri("https://www.googleapis.com/oauth2/v3/userinfo")
         //.userNameAttributeName(IdTokenClaimNames.SUB)
         //.jwkSetUri("https://www.googleapis.com/oauth2/v3/certs")
