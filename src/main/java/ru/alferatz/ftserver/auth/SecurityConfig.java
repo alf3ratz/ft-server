@@ -35,14 +35,21 @@ public class SecurityConfig {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-      http
-          .authorizeRequests(authorizeRequests ->
-              authorizeRequests
-                  .anyRequest().authenticated()
-          )
-          .oauth2Login(
-              withDefaults()
-          );
+//      http
+//          .authorizeRequests(authorizeRequests ->
+//              authorizeRequests
+//                  .anyRequest().authenticated()
+//          )
+//          .oauth2Login(
+//              withDefaults()
+//          );
+      http.authorizeRequests()
+          .antMatchers("/home", "/login**","/callback/", "/webjars/**", "/error**", "/oauth2/authorization/**")
+          .permitAll()
+          .anyRequest()
+          .authenticated()
+          .and()
+          .oauth2Login();
 //      http
 //          .oauth2Login(oauth2Login ->
 //              oauth2Login
