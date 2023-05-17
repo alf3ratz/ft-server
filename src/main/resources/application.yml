@@ -25,7 +25,7 @@ spring:
           hse:
             clientId: fe0df921-754d-45e8-8d48-1fcef2d91df8
             authorization-grant-type: authorization_code
-            redirectUri: https://www.ft-app.online/auth/hse_redirec
+            redirectUri: https://www.ft-app.online/auth/hse_redirect
             #            tokenUri: https://auth.hse.ru/adfs/oauth2/authorize
             clientAuthenticationScheme: form
         provider:
