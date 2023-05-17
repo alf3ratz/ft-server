@@ -49,8 +49,6 @@ public class SecurityConfig {
       http.
           authorizeRequests()
           .mvcMatchers("/<yourProvider>/login")
-          .authenticated()
-          .anyRequest()
           .permitAll()
           .and()
           .sessionManagement()
