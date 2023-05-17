@@ -28,6 +28,7 @@ import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoderFactory;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
@@ -36,62 +37,82 @@ public class SecurityConfig {
   @EnableWebSecurity
   public static class OAuth2LoginSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-//      http
-//          .authorizeRequests(authorizeRequests ->
-//              authorizeRequests
-//                  .anyRequest().authenticated()
-//          )
-//          .oauth2Login(
-//              withDefaults()
-//          );
-      http.
-//          authorizeRequests()
-//          .mvcMatchers("/<yourProvider>/login")
-//          .permitAll()
-//          .and()
-//          .sessionManagement()
-//          .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
-//          .and().authorizeRequests()
-    authorizeRequests()
-          .antMatchers("/home", "/login**", "/callback/", "/webjars/**", "/error**",
-              "/oauth2/authorization/**", "/**")
-          .permitAll()
-          .anyRequest()
-          .authenticated()
-          .and()
-          .oauth2Login();
-//      http
-//          .oauth2Login(oauth2Login ->
-//              oauth2Login
-//                  .clientRegistrationRepository(this.clientRegistrationRepository())
-//                  .authorizedClientRepository(this.authorizedClientRepository())
-//                  .authorizedClientService(this.authorizedClientService())
-//                  .loginPage("/login")
-//                  .authorizationEndpoint(authorizationEndpoint ->
-//                      authorizationEndpoint
-//                          .baseUri(this.authorizationRequestBaseUri())
-//                          .authorizationRequestRepository(this.authorizationRequestRepository())
-//                          .authorizationRequestResolver(this.authorizationRequestResolver())
-//                  )
-//                  .redirectionEndpoint(redirectionEndpoint ->
-//                      redirectionEndpoint
-//                          .baseUri("/auth/hse_redirect")
-//                  )
-//                  .tokenEndpoint(tokenEndpoint ->
-//                      tokenEndpoint
-//                          .accessTokenResponseClient(this.accessTokenResponseClient())
-//                  )
-//                  .userInfoEndpoint(userInfoEndpoint ->
-//                      userInfoEndpoint
-//                          .userAuthoritiesMapper(this.userAuthoritiesMapper())
-//                          .userService(this.oauth2UserService())
-//                          .oidcUserService(this.oidcUserService())
-//                          .customUserType(GitHubOAuth2User.class, "github")
-//                  )
-//          );
+    @Bean
+    @Autowired
+    SecurityFilterChain getSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
+
+      httpSecurity
+          // Disable CSRF (not required for this demo)
+          .csrf().disable();
+
+      // authorize all requests coming through, and ensure that they are
+      // authenticated
+      httpSecurity.authorizeHttpRequests().anyRequest().authenticated();
+
+      // enable oauth2 login, and forward successful logins to the `/welcome` route
+      // Here `true` ensures that the user is forwarded to `/welcome` irrespective of
+      // the original route that they entered through our application
+      httpSecurity.oauth2Login()
+          .defaultSuccessUrl("/welcome", true);
+
+      return httpSecurity.build();
     }
+//    @Override
+//    protected void configure(HttpSecurity http) throws Exception {
+////      http
+////          .authorizeRequests(authorizeRequests ->
+////              authorizeRequests
+////                  .anyRequest().authenticated()
+////          )
+////          .oauth2Login(
+////              withDefaults()
+////          );
+//      http.
+////          authorizeRequests()
+////          .mvcMatchers("/<yourProvider>/login")
+////          .permitAll()
+////          .and()
+////          .sessionManagement()
+////          .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+////          .and().authorizeRequests()
+//    authorizeRequests()
+//          .antMatchers("/home", "/login**", "/callback/", "/webjars/**", "/error**",
+//              "/oauth2/authorization/**", "/**")
+//          .permitAll()
+//          .anyRequest()
+//          .authenticated()
+//          .and()
+//          .oauth2Login();
+////      http
+////          .oauth2Login(oauth2Login ->
+////              oauth2Login
+////                  .clientRegistrationRepository(this.clientRegistrationRepository())
+////                  .authorizedClientRepository(this.authorizedClientRepository())
+////                  .authorizedClientService(this.authorizedClientService())
+////                  .loginPage("/login")
+////                  .authorizationEndpoint(authorizationEndpoint ->
+////                      authorizationEndpoint
+////                          .baseUri(this.authorizationRequestBaseUri())
+////                          .authorizationRequestRepository(this.authorizationRequestRepository())
+////                          .authorizationRequestResolver(this.authorizationRequestResolver())
+////                  )
+////                  .redirectionEndpoint(redirectionEndpoint ->
+////                      redirectionEndpoint
+////                          .baseUri("/auth/hse_redirect")
+////                  )
+////                  .tokenEndpoint(tokenEndpoint ->
+////                      tokenEndpoint
+////                          .accessTokenResponseClient(this.accessTokenResponseClient())
+////                  )
+////                  .userInfoEndpoint(userInfoEndpoint ->
+////                      userInfoEndpoint
+////                          .userAuthoritiesMapper(this.userAuthoritiesMapper())
+////                          .userService(this.oauth2UserService())
+////                          .oidcUserService(this.oidcUserService())
+////                          .customUserType(GitHubOAuth2User.class, "github")
+////                  )
+////          );
+//    }
   }
 
 //  @Bean
