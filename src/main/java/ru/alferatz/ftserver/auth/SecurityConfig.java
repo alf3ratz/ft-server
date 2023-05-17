@@ -12,9 +12,11 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 //import org.springframework.security.oauth2.client.registration.ClientRegistration;
 //import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 //import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProvider;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder;
+import org.springframework.security.oauth2.client.filter.OAuth2ClientContextFilter;
 import org.springframework.security.oauth2.client.oidc.authentication.OidcIdTokenDecoderFactory;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
@@ -26,6 +28,7 @@ import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoderFactory;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
 public class SecurityConfig {
@@ -43,8 +46,18 @@ public class SecurityConfig {
 //          .oauth2Login(
 //              withDefaults()
 //          );
-      http.authorizeRequests()
-          .antMatchers("/home", "/login**","/callback/", "/webjars/**", "/error**", "/oauth2/authorization/**")
+      http.
+          authorizeRequests()
+          .mvcMatchers("/<yourProvider>/login")
+          .authenticated()
+          .anyRequest()
+          .permitAll()
+          .and()
+          .sessionManagement()
+          .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+          .and().authorizeRequests()
+          .antMatchers("/home", "/login**", "/callback/", "/webjars/**", "/error**",
+              "/oauth2/authorization/**")
           .permitAll()
           .anyRequest()
           .authenticated()
