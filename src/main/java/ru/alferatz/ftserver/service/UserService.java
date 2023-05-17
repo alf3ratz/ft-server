@@ -1,6 +1,7 @@
 package ru.alferatz.ftserver.service;
 
 import io.swagger.v3.oas.annotations.servers.Server;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,6 +36,20 @@ public class UserService {
     try {
       userRepository.save(userEntity);
       return userDto;
+    } catch (RuntimeException ex) {
+      throw new InternalServerError(ex.getMessage());
+    } finally {
+      userRepository.flush();
+    }
+  }
+
+  public Optional<UserEntity> findByLogin(String login) {
+    return userRepository.getUserEntityByEmail(login);
+  }
+
+  public UserEntity create(UserEntity userEntity) {
+    try {
+      return userRepository.save(userEntity);
     } catch (RuntimeException ex) {
       throw new InternalServerError(ex.getMessage());
     } finally {

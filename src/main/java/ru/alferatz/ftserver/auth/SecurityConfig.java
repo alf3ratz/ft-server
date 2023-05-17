@@ -31,12 +31,20 @@ import org.springframework.security.oauth2.jwt.JwtDecoderFactory;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import ru.alferatz.ftserver.service.UserService;
 
 @Configuration
 public class SecurityConfig {
 
   @EnableWebSecurity
   public static class OAuth2LoginSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private final MyOAuth2UserService userService;
+
+    @Autowired
+    public OAuth2LoginSecurityConfig(MyOAuth2UserService userService) {
+      this.userService = userService;
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -51,8 +59,10 @@ public class SecurityConfig {
       // enable oauth2 login, and forward successful logins to the `/welcome` route
       // Here `true` ensures that the user is forwarded to `/welcome` irrespective of
       // the original route that they entered through our application
-      http.oauth2Login()
-          .defaultSuccessUrl("/welcome", true);
+      http.oauth2Login(oauth2Login -> oauth2Login
+          .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint.userService(userService))
+      );
+//          .defaultSuccessUrl("/welcome", true);
 
 //      http
 //          .authorizeRequests(authorizeRequests ->
@@ -122,13 +132,18 @@ public class SecurityConfig {
     return idTokenDecoderFactory;
   }
 
-//  @Autowired
+  //  @Autowired
 //  private ResourceServerProperties sso;
 //
 //  @Bean
 //  public ResourceServerTokenServices userInfoTokenServices() {
 //    return new AdfsUserInfoTokenServices(sso.getUserInfoUri(), sso.getClientId());
 //  }
+  @Bean
+  @Autowired
+  public MyOAuth2UserService oAuth2userService(UserService userService) {
+    return new MyOAuth2UserService(userService);
+  }
 
   private ClientRegistration googleClientRegistration() {
 
