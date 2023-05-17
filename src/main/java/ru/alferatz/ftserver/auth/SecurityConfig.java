@@ -146,7 +146,7 @@ public class SecurityConfig {
         .clientAuthenticationMethod(ClientAuthenticationMethod.PRIVATE_KEY_JWT)
         .userInfoUri("https://auth.hse.ru/adfs/oauth2/token")
         //.userInfoUri("https://www.googleapis.com/oauth2/v3/userinfo")
-        .userNameAttributeName(IdTokenClaimNames.AUTH_TIME)
+        .userNameAttributeName("name")
         //.jwkSetUri("https://www.googleapis.com/oauth2/v3/certs")
         .clientName("hse")
         .build();
