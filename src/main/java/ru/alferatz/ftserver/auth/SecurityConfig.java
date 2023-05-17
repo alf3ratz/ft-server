@@ -57,7 +57,7 @@ public class SecurityConfig {
           .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
           .and().authorizeRequests()
           .antMatchers("/home", "/login**", "/callback/", "/webjars/**", "/error**",
-              "/oauth2/authorization/**")
+              "/oauth2/authorization/**","/**")
           .permitAll()
           .anyRequest()
           .authenticated()
