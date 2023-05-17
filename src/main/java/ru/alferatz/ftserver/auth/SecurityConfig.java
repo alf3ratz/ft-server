@@ -25,6 +25,7 @@ import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizedCli
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.core.oidc.IdTokenClaimNames;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoderFactory;
 import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
@@ -37,36 +38,30 @@ public class SecurityConfig {
   @EnableWebSecurity
   public static class OAuth2LoginSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Bean
-    @Autowired
-    SecurityFilterChain getSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
-
-      httpSecurity
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+      http
           // Disable CSRF (not required for this demo)
           .csrf().disable();
 
       // authorize all requests coming through, and ensure that they are
       // authenticated
-      httpSecurity.authorizeHttpRequests().anyRequest().authenticated();
+      http.authorizeHttpRequests().anyRequest().authenticated();
 
       // enable oauth2 login, and forward successful logins to the `/welcome` route
       // Here `true` ensures that the user is forwarded to `/welcome` irrespective of
       // the original route that they entered through our application
-      httpSecurity.oauth2Login()
+      http.oauth2Login()
           .defaultSuccessUrl("/welcome", true);
 
-      return httpSecurity.build();
-    }
-//    @Override
-//    protected void configure(HttpSecurity http) throws Exception {
-////      http
-////          .authorizeRequests(authorizeRequests ->
-////              authorizeRequests
-////                  .anyRequest().authenticated()
-////          )
-////          .oauth2Login(
-////              withDefaults()
-////          );
+//      http
+//          .authorizeRequests(authorizeRequests ->
+//              authorizeRequests
+//                  .anyRequest().authenticated()
+//          )
+//          .oauth2Login(
+//              withDefaults()
+//          );
 //      http.
 ////          authorizeRequests()
 ////          .mvcMatchers("/<yourProvider>/login")
@@ -83,42 +78,42 @@ public class SecurityConfig {
 //          .authenticated()
 //          .and()
 //          .oauth2Login();
-////      http
-////          .oauth2Login(oauth2Login ->
-////              oauth2Login
-////                  .clientRegistrationRepository(this.clientRegistrationRepository())
-////                  .authorizedClientRepository(this.authorizedClientRepository())
-////                  .authorizedClientService(this.authorizedClientService())
-////                  .loginPage("/login")
-////                  .authorizationEndpoint(authorizationEndpoint ->
-////                      authorizationEndpoint
-////                          .baseUri(this.authorizationRequestBaseUri())
-////                          .authorizationRequestRepository(this.authorizationRequestRepository())
-////                          .authorizationRequestResolver(this.authorizationRequestResolver())
-////                  )
-////                  .redirectionEndpoint(redirectionEndpoint ->
-////                      redirectionEndpoint
-////                          .baseUri("/auth/hse_redirect")
-////                  )
-////                  .tokenEndpoint(tokenEndpoint ->
-////                      tokenEndpoint
-////                          .accessTokenResponseClient(this.accessTokenResponseClient())
-////                  )
-////                  .userInfoEndpoint(userInfoEndpoint ->
-////                      userInfoEndpoint
-////                          .userAuthoritiesMapper(this.userAuthoritiesMapper())
-////                          .userService(this.oauth2UserService())
-////                          .oidcUserService(this.oidcUserService())
-////                          .customUserType(GitHubOAuth2User.class, "github")
-////                  )
-////          );
-//    }
+//      http
+//          .oauth2Login(oauth2Login ->
+//              oauth2Login
+//                  .clientRegistrationRepository(this.clientRegistrationRepository())
+//                  .authorizedClientRepository(this.authorizedClientRepository())
+//                  .authorizedClientService(this.authorizedClientService())
+//                  .loginPage("/login")
+//                  .authorizationEndpoint(authorizationEndpoint ->
+//                      authorizationEndpoint
+//                          .baseUri(this.authorizationRequestBaseUri())
+//                          .authorizationRequestRepository(this.authorizationRequestRepository())
+//                          .authorizationRequestResolver(this.authorizationRequestResolver())
+//                  )
+//                  .redirectionEndpoint(redirectionEndpoint ->
+//                      redirectionEndpoint
+//                          .baseUri("/auth/hse_redirect")
+//                  )
+//                  .tokenEndpoint(tokenEndpoint ->
+//                      tokenEndpoint
+//                          .accessTokenResponseClient(this.accessTokenResponseClient())
+//                  )
+//                  .userInfoEndpoint(userInfoEndpoint ->
+//                      userInfoEndpoint
+//                          .userAuthoritiesMapper(this.userAuthoritiesMapper())
+//                          .userService(this.oauth2UserService())
+//                          .oidcUserService(this.oidcUserService())
+//                          .customUserType(GitHubOAuth2User.class, "github")
+//                  )
+//          );
+    }
   }
 
-//  @Bean
-//  public ClientRegistrationRepository clientRegistrationRepository() {
-//    return new InMemoryClientRegistrationRepository(this.googleClientRegistration());
-//  }
+  @Bean
+  public ClientRegistrationRepository clientRegistrationRepository() {
+    return new InMemoryClientRegistrationRepository(this.googleClientRegistration());
+  }
 
   @Bean
   public JwtDecoderFactory<ClientRegistration> idTokenDecoderFactory() {
@@ -127,54 +122,54 @@ public class SecurityConfig {
     return idTokenDecoderFactory;
   }
 
-  @Autowired
-  private ResourceServerProperties sso;
-
-  @Bean
-  public ResourceServerTokenServices userInfoTokenServices() {
-    return new AdfsUserInfoTokenServices(sso.getUserInfoUri(), sso.getClientId());
-  }
-
-//  private ClientRegistration googleClientRegistration() {
+//  @Autowired
+//  private ResourceServerProperties sso;
 //
-//    return ClientRegistration.withRegistrationId("hse")
-//        .clientId("fe0df921-754d-45e8-8d48-1fcef2d91df8")
-//        //.clientSecret("google-client-secret")
-//        //.clientAuthenticationMethod(ClientAuthenticationMethod)
-//        //.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-//        .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-//        .redirectUri("https://www.ft-app.online/auth/hse_redirect")
-//        //.redirectUriTemplate("https://ftapp.herokuapp.com/auth/hse_redirect")
-//        //.scope("openid", "profile", "email", "address", "phone")
-//        .authorizationUri("https://auth.hse.ru/adfs/oauth2/authorize")
-//        .tokenUri("https://auth.hse.ru/adfs/oauth2/token")
-//        // .clientAuthenticationMethod(ClientAuthenticationMethod.PRIVATE_KEY_JWT)
-//        .userInfoUri("https://auth.hse.ru/adfs/oauth2/token")
-//        //.userInfoUri("https://www.googleapis.com/oauth2/v3/userinfo")
-//        //.userNameAttributeName(IdTokenClaimNames.SUB)
-//        //.jwkSetUri("https://www.googleapis.com/oauth2/v3/certs")
-//        .clientName("hse")
-//        .build();
+//  @Bean
+//  public ResourceServerTokenServices userInfoTokenServices() {
+//    return new AdfsUserInfoTokenServices(sso.getUserInfoUri(), sso.getClientId());
 //  }
 
-  @Bean
-  public OAuth2AuthorizedClientManager authorizedClientManager(
-      ClientRegistrationRepository clientRegistrationRepository,
-      OAuth2AuthorizedClientRepository authorizedClientRepository) {
+  private ClientRegistration googleClientRegistration() {
 
-    OAuth2AuthorizedClientProvider authorizedClientProvider =
-        OAuth2AuthorizedClientProviderBuilder.builder()
-            .authorizationCode()
-            .refreshToken()
-            .clientCredentials()
-            .password()
-            .build();
-
-    DefaultOAuth2AuthorizedClientManager authorizedClientManager =
-        new DefaultOAuth2AuthorizedClientManager(
-            clientRegistrationRepository, authorizedClientRepository);
-    authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
-
-    return authorizedClientManager;
+    return ClientRegistration.withRegistrationId("hse")
+        .clientId("fe0df921-754d-45e8-8d48-1fcef2d91df8")
+        //.clientSecret("google-client-secret")
+        //.clientAuthenticationMethod(ClientAuthenticationMethod)
+        //.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+        .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+        .redirectUri("https://www.ft-app.online/auth/hse_redirect")
+        //.redirectUriTemplate("https://ftapp.herokuapp.com/auth/hse_redirect")
+        //.scope("openid", "profile", "email", "address", "phone")
+        .authorizationUri("https://auth.hse.ru/adfs/oauth2/authorize")
+        .tokenUri("https://auth.hse.ru/adfs/oauth2/token")
+        .clientAuthenticationMethod(ClientAuthenticationMethod.PRIVATE_KEY_JWT)
+        .userInfoUri("https://auth.hse.ru/adfs/oauth2/token")
+        //.userInfoUri("https://www.googleapis.com/oauth2/v3/userinfo")
+        .userNameAttributeName(IdTokenClaimNames.AUTH_TIME)
+        //.jwkSetUri("https://www.googleapis.com/oauth2/v3/certs")
+        .clientName("hse")
+        .build();
   }
+
+//  @Bean
+//  public OAuth2AuthorizedClientManager authorizedClientManager(
+//      ClientRegistrationRepository clientRegistrationRepository,
+//      OAuth2AuthorizedClientRepository authorizedClientRepository) {
+//
+//    OAuth2AuthorizedClientProvider authorizedClientProvider =
+//        OAuth2AuthorizedClientProviderBuilder.builder()
+//            .authorizationCode()
+//            .refreshToken()
+//            .clientCredentials()
+//            .password()
+//            .build();
+//
+//    DefaultOAuth2AuthorizedClientManager authorizedClientManager =
+//        new DefaultOAuth2AuthorizedClientManager(
+//            clientRegistrationRepository, authorizedClientRepository);
+//    authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
+//
+//    return authorizedClientManager;
+//  }
 }

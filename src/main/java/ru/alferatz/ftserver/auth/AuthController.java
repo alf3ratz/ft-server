@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.alferatz.ftserver.exceptions.InternalServerError;
 
 @RequestMapping("")
 @RestController
@@ -25,7 +26,11 @@ public class AuthController {
 
   @GetMapping("/auth/hse_redirect")
   public void redirect(@RequestParam("code") String token) {
-    authService.redirect(token);
+    try{
+      authService.redirect(token);
+    }catch (RuntimeException ex){
+      throw new InternalServerError("blabla");
+    }
   }
 
   @PostMapping("/login")
