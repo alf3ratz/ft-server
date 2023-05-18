@@ -48,9 +48,9 @@ public class SecurityConfig {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-      http
-          // Disable CSRF (not required for this demo)
-          .csrf().disable();
+//      http
+//          // Disable CSRF (not required for this demo)
+//          .csrf().disable();
 
       // authorize all requests coming through, and ensure that they are
       // authenticated
