@@ -43,15 +43,15 @@ public class UserService {
     }
   }
 
-  public Optional<UserEntity> findByLogin(String login) {
-    return userRepository.getUserEntityByEmail(login);
+  public Optional<UserEntity> findByEmail(String email) {
+    return userRepository.getUserEntityByEmail(email);
   }
 
   public UserEntity create(UserEntity userEntity) {
     try {
       return userRepository.save(userEntity);
     } catch (RuntimeException ex) {
-      throw new InternalServerError(ex.getMessage());
+      throw new InternalServerError(String.format("blabla: %s", ex.getMessage()));
     } finally {
       userRepository.flush();
     }

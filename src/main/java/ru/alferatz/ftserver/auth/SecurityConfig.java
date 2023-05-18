@@ -158,10 +158,10 @@ public class SecurityConfig {
         //.scope("openid", "profile", "email", "address", "phone")
         .authorizationUri("https://auth.hse.ru/adfs/oauth2/authorize")
         .tokenUri("https://auth.hse.ru/adfs/oauth2/token")
-        .clientAuthenticationMethod(ClientAuthenticationMethod.PRIVATE_KEY_JWT)
+        //.clientAuthenticationMethod(ClientAuthenticationMethod.PRIVATE_KEY_JWT)
         .userInfoUri("https://auth.hse.ru/adfs/oauth2/token")
         //.userInfoUri("https://www.googleapis.com/oauth2/v3/userinfo")
-        .userNameAttributeName("name")
+        .userNameAttributeName("accessToken")
         //.jwkSetUri("https://www.googleapis.com/oauth2/v3/certs")
         .clientName("hse")
         .build();

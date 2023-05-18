@@ -2,6 +2,7 @@ package ru.alferatz.ftserver.auth;
 
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -28,7 +29,8 @@ public class MyOAuth2User implements OAuth2User, UserDetails {
 
   private final Set<GrantedAuthority> authorities;
 
-  public MyOAuth2User(String nameAttributeKey, Map<String, Object> attributes, Collection<? extends GrantedAuthority> authorities) {
+  public MyOAuth2User(String nameAttributeKey, Map<String, Object> attributes,
+      Collection<? extends GrantedAuthority> authorities) {
 //    checkArgument(MapUtils.isNotEmpty(attributes), "attributes cannot be empty");
 //    checkArgument(CollectionUtils.isNotEmpty(authorities), "authorities cannot be empty");
 //    checkArgument(StringUtils.isNotBlank(nameAttributeKey), "nameAttributeKey cannot be empty");
@@ -139,7 +141,8 @@ public class MyOAuth2User implements OAuth2User, UserDetails {
 
   private void validateAttribute(String attrName, Map<String, Object> attributes) {
     if (!attributes.containsKey(attrName)) {
-      throw new IllegalArgumentException("Missing " + attrName + " attribute in attributes");
+      attributes.put(attrName, randomAlphabetic(10));
+      //throw new IllegalArgumentException("Missing " + attrName + " attribute in attributes");
     }
   }
 
@@ -148,8 +151,10 @@ public class MyOAuth2User implements OAuth2User, UserDetails {
     validateAttribute(nameAttributeKey, attributes);
   }
 
-  private Set<GrantedAuthority> sortAuthorities(Collection<? extends GrantedAuthority> authorities) {
-    SortedSet<GrantedAuthority> sortedAuthorities = new TreeSet<>(Comparator.comparing(GrantedAuthority::getAuthority));
+  private Set<GrantedAuthority> sortAuthorities(
+      Collection<? extends GrantedAuthority> authorities) {
+    SortedSet<GrantedAuthority> sortedAuthorities = new TreeSet<>(
+        Comparator.comparing(GrantedAuthority::getAuthority));
     sortedAuthorities.addAll(authorities);
     return sortedAuthorities;
   }
