@@ -26,16 +26,16 @@ public class AuthController {
 
   @GetMapping("/auth/hse_redirect")
   public void redirect(@RequestParam("code") String token) {
-    try{
-      authService.redirect(token);
-    }catch (RuntimeException ex){
-      throw new InternalServerError("blabla");
-    }
+//    try{
+//      authService.redirect(token);
+//    }catch (RuntimeException ex){
+//      throw new InternalServerError("blabla");
+//    }
   }
 
   @PostMapping("/login")
   public void login() {
-    authService.getCode();
+    //authService.getCode();
   }
 
   @GetMapping("/oauth2/authorization/hse")

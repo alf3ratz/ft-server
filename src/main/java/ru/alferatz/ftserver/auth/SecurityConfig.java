@@ -54,6 +54,7 @@ public class SecurityConfig {
 
       // authorize all requests coming through, and ensure that they are
       // authenticated
+      http.cors();
       http.authorizeHttpRequests().anyRequest().authenticated();
 
       // enable oauth2 login, and forward successful logins to the `/welcome` route

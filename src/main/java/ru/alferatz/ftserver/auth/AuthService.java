@@ -24,7 +24,7 @@ import ru.alferatz.ftserver.repository.entity.UserEntity;
 @RequiredArgsConstructor
 public class AuthService {
 
-  private final RestTemplateClient client;
+ // private final RestTemplateClient client;
   private final UserRepository userRepository;
   private WebClient webClient;
   private String tokenUrl = "https://auth.hse.ru/adfs/oauth2/token";
@@ -62,16 +62,16 @@ public class AuthService {
   }
 
   public void redirect(String token) {
-    var result = client.callRestClient(token);
-    ObjectNode objectNode = result.getBody().deepCopy();
-    var tok = objectNode.get("accessToken");
-    var res = tok.toString();
-    UserEntity userEntity = UserEntity.builder()
-        .username(token.substring(0, 20))
-        .email(res.substring(20, 40))
-        .build();
-    userRepository.save(userEntity);
-    userRepository.flush();
+//    var result = client.callRestClient(token);
+//    ObjectNode objectNode = result.getBody().deepCopy();
+//    var tok = objectNode.get("accessToken");
+//    var res = tok.toString();
+//    UserEntity userEntity = UserEntity.builder()
+//        .username(token.substring(0, 20))
+//        .email(res.substring(20, 40))
+//        .build();
+//    userRepository.save(userEntity);
+//    userRepository.flush();
   }
 //  private static void getEmployees()
 //  {

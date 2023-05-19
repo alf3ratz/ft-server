@@ -7,6 +7,13 @@ spring:
     url: jdbc:postgresql://dpg-che2l9bhp8ubgo212rf0-a.frankfurt-postgres.render.com/ftapp_prod
     username: ftapp
     password: a7WzjJ7D0I2IvTikIg8KsCuwQYip0UCH
+  web:
+    cors:
+      allowed-origins: "http://localhost:3000"
+      allowed-methods: GET, POST, PATCH, PUT, DELETE, OPTIONS, HEAD
+      max-age: 3600
+      allowed-headers: "Access-Control-Allow-Origin"
+      exposed-headers: "X-Get-Header"
 #  security:
 #    oauth2:
 #      client:
@@ -22,3 +29,4 @@ spring:
 #            tokenUri: https://auth.hse.ru/adfs/oauth2/token
 ##            userInfoUri: https://auth.hse.ru/adfs/oauth2/token
 ##            userNameAttribute: user
+
