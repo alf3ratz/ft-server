@@ -1,5 +1,13 @@
 server:
-  port: 8080
+  port: 8443
+  http:
+    port: 8080
+  #Open to the world
+    interface: 0.0.0.0
+  ssl:
+    keystore: file:C:\Users\User1337\IdeaProjects\ft-server-third\src\main\resources\keystore.jks
+    key-store-password: password
+    key-password: password
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver

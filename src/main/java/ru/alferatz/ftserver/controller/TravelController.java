@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,6 +30,7 @@ import ru.alferatz.ftserver.service.TravelService;
 @RestController
 @RequiredArgsConstructor
 //@CrossOrigin(exposedHeaders = {"Access-Control-Allow-Origin","Access-Control-Allow-Credentials"})
+@PreAuthorize("hasAuthority('COMPANY_CREATE')")
 public class TravelController {
 
   private final TravelService travelService;

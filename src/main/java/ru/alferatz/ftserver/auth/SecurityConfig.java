@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -54,14 +55,22 @@ public class SecurityConfig {
 
       // authorize all requests coming through, and ensure that they are
       // authenticated
-      http.cors();
-      http.authorizeHttpRequests().anyRequest().authenticated();
-
+      http.cors().and().csrf().disable();
+      // http.authorizeHttpRequests().anyRequest().authenticated()
+      http.authorizeHttpRequests()
+          .antMatchers("/home", "/login**", "/callback/", "/webjars/**", "/error**",
+              "/oauth2/authorization/**", "/**","/auth/**")
+          .permitAll()
+          .antMatchers(HttpMethod.POST, "/api/**","/auth/**")
+          .permitAll()
+          .anyRequest()
+          .authenticated();
       // enable oauth2 login, and forward successful logins to the `/welcome` route
       // Here `true` ensures that the user is forwarded to `/welcome` irrespective of
       // the original route that they entered through our application
       http.oauth2Login(oauth2Login -> oauth2Login
           .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint.userService(userService))
+          .loginPage("/auth/login")
       );
 //          .defaultSuccessUrl("/welcome", true);
 

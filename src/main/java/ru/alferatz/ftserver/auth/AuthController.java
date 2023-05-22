@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.alferatz.ftserver.exceptions.InternalServerError;
 
 @RequestMapping("")
 @RestController
@@ -33,12 +32,12 @@ public class AuthController {
 //    }
   }
 
-  @PostMapping("/login")
+  @PostMapping("/auth/login")
   public void login() {
     //authService.getCode();
   }
 
-  @GetMapping("/oauth2/authorization/hse")
+  @PostMapping("/oauth2/authorization/hse")
   public void check() {
     System.out.println("был тут");
   }

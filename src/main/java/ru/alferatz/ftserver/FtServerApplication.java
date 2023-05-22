@@ -1,6 +1,7 @@
 package ru.alferatz.ftserver;
 
 import java.util.Arrays;
+import java.util.Collections;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -33,10 +34,15 @@ public class FtServerApplication {
         Arrays.asList("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS", "HEAD"));
     configuration.setAllowCredentials(true);
     configuration.setAllowedHeaders(Arrays
-        .asList("Authorization", "Requestor-Type", "Access-Control-Allow-Origin", "Content-Type"));
+        .asList("Authorization", "Requestor-Type", "Access-Control-Allow-Origin", "Content-Type","Strict-Origin-When-Cross-Origin"));
     configuration.setExposedHeaders(Arrays
         .asList("X-Get-Header", "Access-Control-Allow-Origin", "X-Content-Type-Options",
             "X-Frame-Options"));
+//    configuration.setAllowedOrigins(Collections.singletonList("*"));
+//    configuration.setAllowedOriginPatterns(Collections.singletonList("*"));
+//    configuration.setAllowedMethods(Collections.singletonList("*"));
+//    configuration.setAllowedHeaders(Collections.singletonList("*"));
+    configuration.setAllowCredentials(true);
     configuration.setMaxAge(3600L);
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);
