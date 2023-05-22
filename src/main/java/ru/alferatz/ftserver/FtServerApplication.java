@@ -29,7 +29,7 @@ public class FtServerApplication {
   @Bean
   CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000","https://6466e6d30012ed2bf9aa3748--serene-semolina-0dd3f7.netlify.app"));
+    configuration.setAllowedOrigins(Arrays.asList("https://localhost:3000","https://6466e6d30012ed2bf9aa3748--serene-semolina-0dd3f7.netlify.app"));
     configuration.setAllowedMethods(
         Arrays.asList("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS", "HEAD"));
     configuration.setAllowCredentials(true);
