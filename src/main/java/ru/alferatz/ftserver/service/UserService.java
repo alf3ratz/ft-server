@@ -1,6 +1,5 @@
 package ru.alferatz.ftserver.service;
 
-import io.swagger.v3.oas.annotations.servers.Server;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
