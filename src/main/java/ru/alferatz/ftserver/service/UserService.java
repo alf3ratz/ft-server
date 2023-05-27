@@ -1,6 +1,8 @@
 package ru.alferatz.ftserver.service;
 
 import io.swagger.v3.oas.annotations.servers.Server;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,6 +29,7 @@ public class UserService {
     UserEntity userEntity = UserEntity.builder()
         .username(request.getUsername())
         .email(request.getUserEmail())
+        .lastLogged(LocalDateTime.now())
         .build();
     UserDto userDto = UserDto.builder()
         .username(request.getUsername())
@@ -37,6 +40,20 @@ public class UserService {
       return userDto;
     } catch (RuntimeException ex) {
       throw new InternalServerError(ex.getMessage());
+    } finally {
+      userRepository.flush();
+    }
+  }
+
+  public Optional<UserEntity> findByEmail(String email) {
+    return userRepository.getUserEntityByEmail(email);
+  }
+
+  public UserEntity create(UserEntity userEntity) {
+    try {
+      return userRepository.save(userEntity);
+    } catch (RuntimeException ex) {
+      throw new InternalServerError(String.format("blabla: %s", ex.getMessage()));
     } finally {
       userRepository.flush();
     }

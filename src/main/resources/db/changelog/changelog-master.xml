@@ -10,4 +10,5 @@
   <include file="/db/changelog/changes/create-chat-tables-3.xml"/>
   <include file="/db/changelog/changes/update-tables-4.xml"/>
   <include file="/db/changelog/changes/create-history-table-5.xml"/>
+  <include file="/db/changelog/changes/update-user-table-6.xml"/>
 </databaseChangeLog>

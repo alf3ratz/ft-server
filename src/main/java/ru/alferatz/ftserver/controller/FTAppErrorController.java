@@ -37,4 +37,5 @@ public class FTAppErrorController implements ErrorController {
             .build()
         );
   }
+
 }

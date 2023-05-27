@@ -1,11 +1,32 @@
 server:
   port: 8080
+  forward-headers-strategy: framework
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://dpg-che2l9bhp8ubgo212rf0-a.frankfurt-postgres.render.com/ftapp_prod
     username: ftapp
     password: a7WzjJ7D0I2IvTikIg8KsCuwQYip0UCH
-#    url: jdbc:postgresql://ec2-54-80-122-11.compute-1.amazonaws.com:5432/d2duq9ekdqf40t
-#    username: njhcjjhszaojaq
-#    password: 66a1175a8f4e85e5a8f2e347a3f4596c52e8792920d9d986c43171f5aa0db70b
+  web:
+    cors:
+      allowed-origins: "http://localhost:3000"
+      allowed-methods: GET, POST, PATCH, PUT, DELETE, OPTIONS, HEAD
+      max-age: 3600
+      allowed-headers: "Access-Control-Allow-Origin"
+      exposed-headers: "X-Get-Header"
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          hse:
+#            clientId: fe0df921-754d-45e8-8d48-1fcef2d91df8
+#            authorization-grant-type: authorization_code
+#            redirectUri: https://www.ft-app.online/auth/hse_redirect
+#            clientAuthenticationScheme: form
+#        provider:
+#          hse:
+#            authorizationUri: https://auth.hse.ru/adfs/oauth2/authorize
+#            tokenUri: https://auth.hse.ru/adfs/oauth2/token
+##            userInfoUri: https://auth.hse.ru/adfs/oauth2/token
+##            userNameAttribute: user
+

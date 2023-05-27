@@ -3,10 +3,12 @@ package ru.alferatz.ftserver.chat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
+import org.hibernate.annotations.common.util.impl.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.alferatz.ftserver.chat.entity.ChatMessageDto;
 import ru.alferatz.ftserver.chat.entity.ChatMessageDtoFactory;
@@ -25,7 +27,7 @@ import ru.alferatz.ftserver.repository.entity.UserEntity;
 @RequiredArgsConstructor
 public class ChatService {
 
-  private static final Logger logger = LoggerFactory.getLogger(ChatService.class);
+  //private static final Logger logger = LoggerFactory.getLogger(ChatService.class);
 
   //  private final SimpMessagingTemplate messagingTemplate;
   private final ChatRoomRepository chatRoomRepository;
@@ -57,8 +59,8 @@ public class ChatService {
 //    messagingTemplate.convertAndSend(
 //        "/topic/chat/"
 //    );
-    logger
-        .info(String.format("Message [%s] sent to chat: [%d] from: [%s]", message, chatId, sender));
+//    logger
+//        .info(String.format("Message [%s] sent to chat: [%d] from: [%s]", message, chatId, sender));
   }
 
   public Long createChatRoom(String authorEmail) {
@@ -84,8 +86,8 @@ public class ChatService {
       throw new InternalServerError("Не удалось сохранить чат: {}".replace("{}", e.getMessage()));
     } finally {
       chatRoomRepository.flush();
-      logger
-          .info(String.format("Chat with id: [%d] created by [%s]", newChat.getId(), authorEmail));
+//      logger
+//          .info(String.format("Chat with id: [%d] created by [%s]", newChat.getId(), authorEmail));
     }
   }
 

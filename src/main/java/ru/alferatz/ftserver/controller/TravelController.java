@@ -8,6 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +29,8 @@ import ru.alferatz.ftserver.service.TravelService;
 @RequestMapping("/api/travel")
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin/*(origins = "https://ftapp-aapetropavlovskiy.b4a.run")*/
+//@CrossOrigin(exposedHeaders = {"Access-Control-Allow-Origin","Access-Control-Allow-Credentials"})
+@PreAuthorize("hasAuthority('COMPANY_CREATE')")
 public class TravelController {
 
   private final TravelService travelService;
@@ -36,6 +41,8 @@ public class TravelController {
       @RequestParam(value = "offset", defaultValue = "0") @Min(0) Integer offset,
       @RequestParam(value = "limit", defaultValue = "10") @Min(1) @Max(10) Integer limit) {
 
+    SecurityContext context = SecurityContextHolder.getContext();
+    Authentication token = SecurityContextHolder.getContext().getAuthentication();
     var openTravelsPair = travelService.getAllOpenTravels(PageRequest.of(offset, limit));
     Page<TravelEntity> openTravels = openTravelsPair.getLeft();
     var map = openTravelsPair.getRight();
