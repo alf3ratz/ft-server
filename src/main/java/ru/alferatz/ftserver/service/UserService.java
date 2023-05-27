@@ -1,6 +1,7 @@
 package ru.alferatz.ftserver.service;
 
 import io.swagger.v3.oas.annotations.servers.Server;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class UserService {
     UserEntity userEntity = UserEntity.builder()
         .username(request.getUsername())
         .email(request.getUserEmail())
+        .lastLogged(LocalDateTime.now())
         .build();
     UserDto userDto = UserDto.builder()
         .username(request.getUsername())

@@ -8,6 +8,7 @@ import static org.apache.commons.collections4.MapUtils.emptyIfNull;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
@@ -86,65 +87,65 @@ public class MyOAuth2UserService implements OAuth2UserService<OAuth2UserRequest,
     } catch (JsonProcessingException e) {
       e.printStackTrace();
     }
-    checkNotNull(userRequest, "userRequest cannot be null");
-    if (!StringUtils
-        .hasText(userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint()
-            .getUri())) {
-      OAuth2Error oauth2Error = new OAuth2Error(MISSING_USER_INFO_URI_ERROR_CODE,
-          "Missing required UserInfo Uri in UserInfoEndpoint for Client Registration: "
-              + userRequest.getClientRegistration().getRegistrationId(), null);
-      throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString());
-    }
-
-    String registrationId = userRequest.getClientRegistration().getRegistrationId();
-    String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails()
-        .getUserInfoEndpoint().getUserNameAttributeName();
-    if (!StringUtils.hasText(userNameAttributeName)) {
-      OAuth2Error oauth2Error = new OAuth2Error(
-          MISSING_USER_NAME_ATTRIBUTE_ERROR_CODE,
-          "Missing required \"user name\" attribute name in UserInfoEndpoint for Client Registration: "
-              + registrationId, null);
-      throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString());
-    }
-
-    ResponseEntity<Map<String, Object>> response;
-    try {
-      // OAuth2UserRequestEntityConverter cannot return null values.
-      //noinspection ConstantConditions
-      response = this.restOperations
-          .exchange(requestEntityConverter.convert(userRequest), PARAMETERIZED_RESPONSE_TYPE);
-    } catch (OAuth2AuthorizationException ex) {
-      OAuth2Error oauth2Error = ex.getError();
-      StringBuilder errorDetails = new StringBuilder();
-      errorDetails.append("Error details: [");
-      errorDetails.append("UserInfo Uri: ").append(
-          userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUri());
-      errorDetails.append(", Error Code: ").append(oauth2Error.getErrorCode());
-      if (oauth2Error.getDescription() != null) {
-        errorDetails.append(", Error Description: ").append(oauth2Error.getDescription());
-      }
-      errorDetails.append("]");
-      oauth2Error = new OAuth2Error(INVALID_USER_INFO_RESPONSE_ERROR_CODE,
-          "An error occurred while attempting to retrieve the UserInfo Resource: " + errorDetails
-              .toString(), null);
-      throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString(), ex);
-    } catch (RestClientException ex) {
-      OAuth2Error oauth2Error = new OAuth2Error(INVALID_USER_INFO_RESPONSE_ERROR_CODE,
-          "An error occurred while attempting to retrieve the UserInfo Resource: " + ex
-              .getMessage(), null);
-      throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString(), ex);
-    }
+//    checkNotNull(userRequest, "userRequest cannot be null");
+//    if (!StringUtils
+//        .hasText(userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint()
+//            .getUri())) {
+//      OAuth2Error oauth2Error = new OAuth2Error(MISSING_USER_INFO_URI_ERROR_CODE,
+//          "Missing required UserInfo Uri in UserInfoEndpoint for Client Registration: "
+//              + userRequest.getClientRegistration().getRegistrationId(), null);
+//      throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString());
+//    }
+//
+//    String registrationId = userRequest.getClientRegistration().getRegistrationId();
+//    String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails()
+//        .getUserInfoEndpoint().getUserNameAttributeName();
+//    if (!StringUtils.hasText(userNameAttributeName)) {
+//      OAuth2Error oauth2Error = new OAuth2Error(
+//          MISSING_USER_NAME_ATTRIBUTE_ERROR_CODE,
+//          "Missing required \"user name\" attribute name in UserInfoEndpoint for Client Registration: "
+//              + registrationId, null);
+//      throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString());
+//    }
+//
+//    ResponseEntity<Map<String, Object>> response;
+//    try {
+//      // OAuth2UserRequestEntityConverter cannot return null values.
+//      //noinspection ConstantConditions
+//      response = this.restOperations
+//          .exchange(requestEntityConverter.convert(userRequest), PARAMETERIZED_RESPONSE_TYPE);
+//    } catch (OAuth2AuthorizationException ex) {
+//      OAuth2Error oauth2Error = ex.getError();
+//      StringBuilder errorDetails = new StringBuilder();
+//      errorDetails.append("Error details: [");
+//      errorDetails.append("UserInfo Uri: ").append(
+//          userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUri());
+//      errorDetails.append(", Error Code: ").append(oauth2Error.getErrorCode());
+//      if (oauth2Error.getDescription() != null) {
+//        errorDetails.append(", Error Description: ").append(oauth2Error.getDescription());
+//      }
+//      errorDetails.append("]");
+//      oauth2Error = new OAuth2Error(INVALID_USER_INFO_RESPONSE_ERROR_CODE,
+//          "An error occurred while attempting to retrieve the UserInfo Resource: " + errorDetails
+//              .toString(), null);
+//      throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString(), ex);
+//    } catch (RestClientException ex) {
+//      OAuth2Error oauth2Error = new OAuth2Error(INVALID_USER_INFO_RESPONSE_ERROR_CODE,
+//          "An error occurred while attempting to retrieve the UserInfo Resource: " + ex
+//              .getMessage(), null);
+//      throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString(), ex);
+//    }
 
     Map<String, Object> userAttributes = new HashMap();//.ofEntries(entry("username", new Object()),entry("display_name",new Object()));//emptyIfNull(response.getBody());
-    userAttributes.put("username", "aboba");
-    userAttributes.put("display_name", "display_name_aboba");
+    userAttributes.put("username", user.getUsername());
+    userAttributes.put("email", user.getEmail());
     Set<GrantedAuthority> authorities = new LinkedHashSet<>();
     authorities.add(new OAuth2UserAuthority(userAttributes));
 
     for (String authority : userRequest.getAccessToken().getScopes()) {
       authorities.add(new SimpleGrantedAuthority("SCOPE_" + authority));
     }
-
+    var userNameAttributeName = user.getUsername();
     // ищем пользователя в нашей БД, либо создаем нового
     // если пользователь не найден и система не подразумевает автоматической регистрации,
     // необходимо сгенерировать тут исключение
@@ -155,14 +156,20 @@ public class MyOAuth2UserService implements OAuth2UserService<OAuth2UserRequest,
 
   private UserEntity findOrCreate(String name, String lastName, String email) {
     Optional<UserEntity> userOpt = userService.findByEmail(email);
+    UserEntity updatedUser = null;
+
     if (userOpt.isEmpty()) {
       UserEntity user = UserEntity.builder()
           .username(String.format("%s %s", lastName, name))
           .email(email)
+          .lastLogged(LocalDateTime.now())
           .build();
       return userService.create(user);
+    } else {
+      updatedUser = userOpt.get();
+      updatedUser.setLastLogged(LocalDateTime.now());
     }
-    return userOpt.get();
+    return updatedUser;
   }
 
   private RestTemplate createRestTemplate() {

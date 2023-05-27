@@ -1,5 +1,6 @@
 package ru.alferatz.ftserver.repository.entity;
 
+import java.time.LocalDateTime;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import lombok.*;
@@ -31,5 +32,6 @@ public class UserEntity {
 
   private Long chatId;
 
+  private LocalDateTime lastLogged;
 
 }
