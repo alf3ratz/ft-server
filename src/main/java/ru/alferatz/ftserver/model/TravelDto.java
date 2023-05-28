@@ -34,4 +34,9 @@ public class TravelDto {
   @Builder.Default
   private Long chatId = 0L;
 
+  private CoordsObject placeFromCoords;
+
+  private CoordsObject placeToCoords;
+  private String travelStatus;
+
 }

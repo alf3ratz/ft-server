@@ -7,7 +7,7 @@ import ru.alferatz.ftserver.repository.entity.TravelEntity;
 @Component
 public class TravelDtoFactory {
 
-  public TravelDto makeTravelDto(TravelEntity travelEntity, List<UserDto> participants){
+  public TravelDto makeTravelDto(TravelEntity travelEntity, List<UserDto> participants) {
     return TravelDto.builder()
         .id(travelEntity.getId())
         .authorEmail(travelEntity.getAuthor())
@@ -18,6 +18,9 @@ public class TravelDtoFactory {
         .placeTo(travelEntity.getPlaceTo())
         .chatId(travelEntity.getChatId())
         .participants(participants)
+        .travelStatus(travelEntity.getTravelStatus())
+        .placeFromCoords(travelEntity.getPlaceFromCoords())
+        .placeToCoords(travelEntity.getPlaceToCoords())
         .build();
   }
 }

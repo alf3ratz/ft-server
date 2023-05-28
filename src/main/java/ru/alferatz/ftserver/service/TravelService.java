@@ -89,6 +89,8 @@ public class TravelService {
         .countOfParticipants(travelDto.getCountOfParticipants())
         .travelStatus(TravelStatus.CREATED.name())
         .comment(travelDto.getComment())
+        .placeFromCoords(travelDto.getPlaceFromCoords())
+        .placeToCoords(travelDto.getPlaceToCoords())
         .chatId(newChatRoom.getId())
         .build();
 
@@ -211,6 +213,10 @@ public class TravelService {
       travelEntity.setPlaceFrom(travelDto.getPlaceFrom());
       travelEntity.setPlaceTo(travelDto.getPlaceTo());
       travelEntity.setComment(travelDto.getComment());
+      if(travelDto.getPlaceFromCoords() != null && travelDto.getPlaceToCoords() != null){
+        travelEntity.setPlaceFromCoords(travelDto.getPlaceFromCoords());
+        travelEntity.setPlaceToCoords(travelDto.getPlaceToCoords());
+      }
       try {
         travelRepository.save(travelEntity);
         return travelServiceUtils.buildTravelDto(travelEntity, userDtoList);
