@@ -7,6 +7,10 @@ spring:
     url: jdbc:postgresql://dpg-che2l9bhp8ubgo212rf0-a.frankfurt-postgres.render.com/ftapp_prod
     username: ftapp
     password: a7WzjJ7D0I2IvTikIg8KsCuwQYip0UCH
+    hikari:
+      data-source-properties: stringtype=unspecified
+    tomcat:
+      connection-properties: stringtype=unspecified
   web:
     cors:
       allowed-origins: "http://localhost:3000"
