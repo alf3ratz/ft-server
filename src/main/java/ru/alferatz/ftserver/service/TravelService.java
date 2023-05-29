@@ -1,6 +1,7 @@
 package ru.alferatz.ftserver.service;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.Page;
@@ -12,6 +13,7 @@ import ru.alferatz.ftserver.exceptions.AlreadyExistException;
 import ru.alferatz.ftserver.exceptions.BadRequestException;
 import ru.alferatz.ftserver.exceptions.InternalServerError;
 import ru.alferatz.ftserver.exceptions.NotFoundException;
+import ru.alferatz.ftserver.model.TravelDtoFactory;
 import ru.alferatz.ftserver.model.request.ConnectToTravelRequest;
 import ru.alferatz.ftserver.model.TravelDto;
 import ru.alferatz.ftserver.model.UserDto;
@@ -36,6 +38,7 @@ public class TravelService {
   private final UserRepository userRepository;
   private final ChatRoomRepository chatRoomRepository;
   private final UserTravelHistoryRepository userTravelHistoryRepository;
+  private final TravelDtoFactory travelDtoFactory;
 
   private final Set<String> statusesExceptClosed = new HashSet<>(Arrays
       .asList(TravelStatus.CREATED.name(), TravelStatus.IN_PROGRESS.name()));
@@ -82,7 +85,7 @@ public class TravelService {
     // Создали объявление, которое сохранится в базе
     travelEntity = TravelEntity.builder()
         .author(travelDto.getAuthorEmail())
-        .createTime(LocalDateTime.now())
+        .createTime(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
         .startTime(LocalDateTime.parse(travelDto.getStartTime()))
         .placeFrom(travelDto.getPlaceFrom())
         .placeTo(travelDto.getPlaceTo())
@@ -332,7 +335,7 @@ public class TravelService {
         .getUserDtoListFromUserEntityList(userRepository, travelEntity.getId(),
             travelEntity.getAuthor());
     userDtoList.removeIf(i -> i.getEmail().equals(travelEntity.getAuthor()));
-    return travelServiceUtils.buildTravelDto(travelEntity, userDtoList);
+    return travelDtoFactory.makeTravelDto(travelEntity, userDtoList);
   }
 
   public TravelDto getTravelByUserEmail(String authorEmail) {
@@ -351,7 +354,7 @@ public class TravelService {
     List<UserDto> userDtoList = travelServiceUtils
         .getUserDtoListFromUserEntityList(userRepository, travelEntity.getId(), authorEmail);
     userDtoList.removeIf(i -> i.getEmail().equals(travelEntity.getAuthor()));
-    return travelServiceUtils.buildTravelDto(travelEntity, userDtoList);
+    return travelDtoFactory.makeTravelDto(travelEntity, userDtoList);
   }
 
   /**

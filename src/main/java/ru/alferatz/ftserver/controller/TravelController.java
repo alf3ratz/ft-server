@@ -74,17 +74,7 @@ public class TravelController {
   @PostMapping("/createTravel")
   public TravelDto createTravel(@RequestBody TravelDto travelDto) {
     var newTravelEntity = travelService.createTravel(travelDto);
-    return TravelDto.builder()
-        .id(newTravelEntity.getId())
-        .authorEmail(newTravelEntity.getAuthor())
-        .createTime(newTravelEntity.getCreateTime().toString())
-        .startTime(newTravelEntity.getStartTime().toString())
-        .countOfParticipants(newTravelEntity.getCountOfParticipants())
-        .placeFrom(newTravelEntity.getPlaceFrom())
-        .placeTo(newTravelEntity.getPlaceTo())
-        .chatId(newTravelEntity.getChatId())
-        .comment(newTravelEntity.getComment())
-        .build();
+    return travelDtoFactory.makeTravelDto(newTravelEntity, null);
   }
 
   @PostMapping("/updateTravel")
