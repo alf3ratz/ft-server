@@ -13,4 +13,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class AuthResponse {
   private boolean isLogged;
+  private String username;
+  private String email;
 }
