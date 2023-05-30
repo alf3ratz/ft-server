@@ -40,7 +40,7 @@ public class TravelController {
   public Page<TravelDto> getOpenTravels(
       @RequestParam(value = "offset", defaultValue = "0") @Min(0) Integer offset,
       @RequestParam(value = "limit", defaultValue = "10") @Min(1) @Max(10) Integer limit) {
-
+    travelService.closeTravelsIfNeeded();
     SecurityContext context = SecurityContextHolder.getContext();
     Authentication token = SecurityContextHolder.getContext().getAuthentication();
     var openTravelsPair = travelService.getAllOpenTravels(PageRequest.of(offset, limit));

@@ -2,11 +2,13 @@ package ru.alferatz.ftserver.service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.alferatz.ftserver.chat.entity.ChatRoom;
 import ru.alferatz.ftserver.chat.repository.ChatRoomRepository;
 import ru.alferatz.ftserver.exceptions.AlreadyExistException;
@@ -216,7 +218,7 @@ public class TravelService {
       travelEntity.setPlaceFrom(travelDto.getPlaceFrom());
       travelEntity.setPlaceTo(travelDto.getPlaceTo());
       travelEntity.setComment(travelDto.getComment());
-      if(travelDto.getPlaceFromCoords() != null && travelDto.getPlaceToCoords() != null){
+      if (travelDto.getPlaceFromCoords() != null && travelDto.getPlaceToCoords() != null) {
         travelEntity.setPlaceFromCoords(travelDto.getPlaceFromCoords());
         travelEntity.setPlaceToCoords(travelDto.getPlaceToCoords());
       }
@@ -404,6 +406,31 @@ public class TravelService {
       throw new InternalServerError("Не удалось передать лидерство поездкой");
     } finally {
       travelRepository.flush();
+    }
+  }
+
+  @Transactional
+  public void closeTravelsIfNeeded() {
+    var travelEntities = travelRepository.getAllTravelsByCondition();
+    var localTime = LocalDateTime.now();
+    travelEntities = travelEntities.stream().filter(i->{
+      long hours = ChronoUnit.HOURS.between(i.getStartTime(), localTime);
+      return hours > 3;
+    }).collect(Collectors.toList());
+    try {
+      travelEntities.forEach(i -> {
+        var participants = userRepository.getAllByTravelId(i.getId())
+            .orElseGet(Collections::emptyList);
+        participants.forEach(j -> {
+          travelServiceUtils.unlinkParticipantFromChat(userRepository, j.getEmail());
+          travelServiceUtils
+              .unlinkParticipantToTravel(userRepository, j.getEmail(), i.getId());
+        });
+        travelRepository.setStatusToTravel(i.getId(), TravelStatus.CLOSED.name());
+      });
+    } catch (RuntimeException ex) {
+      throw new InternalServerError(
+          String.format("Не удалось закрыть незакрыте объявления: %s", ex.getMessage()));
     }
   }
 }

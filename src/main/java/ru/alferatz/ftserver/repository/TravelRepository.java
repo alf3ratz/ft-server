@@ -35,5 +35,9 @@ public interface TravelRepository extends JpaRepository<TravelEntity, Long> {
   @Modifying
   @Query("update TravelEntity travel set travel.travelStatus = ?2 where travel.id = ?1")
   void setStatusToTravel(Long travelId, String status);
+
+  @Modifying
+  @Query(value = "select * from travel_jn t where  CURRENT_TIMESTAMP > t.start_time and t.travel_status in ('CREATED','IN_PROGRESS')", nativeQuery = true)
+  List<TravelEntity> getAllTravelsByCondition();
 }
 
