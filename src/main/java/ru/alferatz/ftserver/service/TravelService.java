@@ -309,14 +309,14 @@ public class TravelService {
     userDtoList.removeIf(i -> i.getEmail().equals(closingTravel.getAuthor()));
     // Удаляем связь каждого пользователя с поездкой и чатом
     usersInTravel.forEach(i -> {
-      travelServiceUtils.unlinkParticipantFromChat(userRepository, i.getEmail());
-      travelServiceUtils
-          .unlinkParticipantToTravel(userRepository, i.getEmail(), closingTravel.getId());
       userTravelHistoryRepository.save(UserTravelHistoryEntity.builder()
           .userId(i.getId())
           .travelId(closingTravel.getId())
           .chatId(closingTravel.getChatId())
           .build());
+      travelServiceUtils.unlinkParticipantFromChat(userRepository, i.getEmail());
+      travelServiceUtils
+          .unlinkParticipantToTravel(userRepository, i.getEmail(), closingTravel.getId());
     });
 
     try {
@@ -428,6 +428,11 @@ public class TravelService {
         var participants = userRepository.getAllByTravelId(i.getId())
             .orElseGet(Collections::emptyList);
         participants.forEach(j -> {
+          userTravelHistoryRepository.save(UserTravelHistoryEntity.builder()
+              .userId(j.getId())
+              .travelId(i.getId())
+              .chatId(i.getChatId())
+              .build());
           travelServiceUtils.unlinkParticipantFromChat(userRepository, j.getEmail());
           travelServiceUtils
               .unlinkParticipantToTravel(userRepository, j.getEmail(), i.getId());
