@@ -263,6 +263,11 @@ public class TravelService {
     }
     var participants = userRepository.getAllByTravelId(travelId).orElseGet(Collections::emptyList);
     participants.forEach(i -> {
+      userTravelHistoryRepository.save(UserTravelHistoryEntity.builder()
+          .userId(i.getId())
+          .travelId(travelEntity.getId())
+          .chatId(travelEntity.getChatId())
+          .build());
       travelServiceUtils.unlinkParticipantFromChat(userRepository, i.getEmail());
       travelServiceUtils
           .unlinkParticipantToTravel(userRepository, i.getEmail(), travelEntity.getId());
@@ -275,6 +280,7 @@ public class TravelService {
       throw new InternalServerError("Не удалось удалить поездку");
     } finally {
       travelRepository.flush();
+      userTravelHistoryRepository.flush();
     }
   }
 
@@ -413,7 +419,7 @@ public class TravelService {
   public void closeTravelsIfNeeded() {
     var travelEntities = travelRepository.getAllTravelsByCondition();
     var localTime = LocalDateTime.now();
-    travelEntities = travelEntities.stream().filter(i->{
+    travelEntities = travelEntities.stream().filter(i -> {
       long hours = ChronoUnit.HOURS.between(i.getStartTime(), localTime);
       return hours > 3;
     }).collect(Collectors.toList());
