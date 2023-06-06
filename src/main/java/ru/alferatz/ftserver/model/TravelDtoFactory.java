@@ -18,6 +18,7 @@ public class TravelDtoFactory {
         .placeTo(travelEntity.getPlaceTo())
         .chatId(travelEntity.getChatId())
         .participants(participants)
+        .comment(travelEntity.getComment())
         .travelStatus(travelEntity.getTravelStatus())
         .placeFromCoords(travelEntity.getPlaceFromCoords())
         .placeToCoords(travelEntity.getPlaceToCoords())

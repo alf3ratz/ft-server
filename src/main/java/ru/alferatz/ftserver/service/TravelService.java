@@ -65,6 +65,9 @@ public class TravelService {
       throw new AlreadyExistException("У пользователя уже имеется активная поездка");
     }
     UserEntity user = userRepository.getUserEntityByEmail(travelDto.getAuthorEmail()).orElse(null);
+    if(user == null){
+      throw new InternalServerError("Пользователь отсутствует в системе");
+    }
     if (user.getTravelId() != null) {
       throw new InternalServerError("Пользователь уже находится в поездке");
     }
