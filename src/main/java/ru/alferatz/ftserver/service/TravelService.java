@@ -221,6 +221,9 @@ public class TravelService {
       travelEntity.setPlaceFrom(travelDto.getPlaceFrom());
       travelEntity.setPlaceTo(travelDto.getPlaceTo());
       travelEntity.setComment(travelDto.getComment());
+      travelEntity.setStartTime(LocalDateTime.parse(travelDto.getStartTime()));
+      travelEntity.setPlaceFromCoords(travelDto.getPlaceFromCoords());
+      travelEntity.setPlaceToCoords(travelDto.getPlaceToCoords());
       if (travelDto.getPlaceFromCoords() != null && travelDto.getPlaceToCoords() != null) {
         travelEntity.setPlaceFromCoords(travelDto.getPlaceFromCoords());
         travelEntity.setPlaceToCoords(travelDto.getPlaceToCoords());
