@@ -65,7 +65,7 @@ public class TravelService {
       throw new AlreadyExistException("У пользователя уже имеется активная поездка");
     }
     UserEntity user = userRepository.getUserEntityByEmail(travelDto.getAuthorEmail()).orElse(null);
-    if(user == null){
+    if (user == null) {
       throw new InternalServerError("Пользователь отсутствует в системе");
     }
     if (user.getTravelId() != null) {
@@ -100,6 +100,7 @@ public class TravelService {
         .placeFromCoords(travelDto.getPlaceFromCoords())
         .placeToCoords(travelDto.getPlaceToCoords())
         .chatId(newChatRoom.getId())
+        .price(travelDto.getPrice())
         .build();
 
     try {
@@ -215,29 +216,27 @@ public class TravelService {
         .getUserDtoListFromUserEntityList(userRepository, travelEntity.getId(),
             travelEntity.getAuthor());
     userDtoList.removeIf(i -> i.getEmail().equals(travelEntity.getAuthor()));
-    if (travelServiceUtils.isTravelChanged(travelEntity, travelDto)) {
-      travelEntity.setCountOfParticipants(travelDto.getCountOfParticipants());
-      travelEntity.setCountOfParticipants(travelDto.getCountOfParticipants());
-      travelEntity.setPlaceFrom(travelDto.getPlaceFrom());
-      travelEntity.setPlaceTo(travelDto.getPlaceTo());
-      travelEntity.setComment(travelDto.getComment());
-      travelEntity.setStartTime(LocalDateTime.parse(travelDto.getStartTime()));
+    travelEntity.setCountOfParticipants(travelDto.getCountOfParticipants());
+    travelEntity.setCountOfParticipants(travelDto.getCountOfParticipants());
+    travelEntity.setPlaceFrom(travelDto.getPlaceFrom());
+    travelEntity.setPlaceTo(travelDto.getPlaceTo());
+    travelEntity.setComment(travelDto.getComment());
+    travelEntity.setStartTime(LocalDateTime.parse(travelDto.getStartTime()));
+    travelEntity.setPlaceFromCoords(travelDto.getPlaceFromCoords());
+    travelEntity.setPlaceToCoords(travelDto.getPlaceToCoords());
+    travelEntity.setPrice(travelDto.getPrice());
+    if (travelDto.getPlaceFromCoords() != null && travelDto.getPlaceToCoords() != null) {
       travelEntity.setPlaceFromCoords(travelDto.getPlaceFromCoords());
       travelEntity.setPlaceToCoords(travelDto.getPlaceToCoords());
-      if (travelDto.getPlaceFromCoords() != null && travelDto.getPlaceToCoords() != null) {
-        travelEntity.setPlaceFromCoords(travelDto.getPlaceFromCoords());
-        travelEntity.setPlaceToCoords(travelDto.getPlaceToCoords());
-      }
-      try {
-        travelRepository.save(travelEntity);
-        return travelServiceUtils.buildTravelDto(travelEntity, userDtoList);
-      } catch (RuntimeException ex) {
-        throw new InternalServerError("Не удалось обновить поездку в базе");
-      } finally {
-        travelRepository.flush();
-      }
     }
-    return travelServiceUtils.buildTravelDto(travelEntity, userDtoList);
+    try {
+      travelRepository.save(travelEntity);
+      return travelDtoFactory.makeTravelDto(travelEntity, userDtoList);
+    } catch (RuntimeException ex) {
+      throw new InternalServerError("Не удалось обновить поездку в базе");
+    } finally {
+      travelRepository.flush();
+    }
   }
 
   /**

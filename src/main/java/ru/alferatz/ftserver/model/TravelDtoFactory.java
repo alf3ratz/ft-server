@@ -22,6 +22,7 @@ public class TravelDtoFactory {
         .travelStatus(travelEntity.getTravelStatus())
         .placeFromCoords(travelEntity.getPlaceFromCoords())
         .placeToCoords(travelEntity.getPlaceToCoords())
+        .price(travelEntity.getPrice())
         .build();
   }
 }

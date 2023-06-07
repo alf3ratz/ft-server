@@ -38,5 +38,5 @@ public class TravelDto {
 
   private CoordsObject placeToCoords;
   private String travelStatus;
-
+  private Integer price;
 }

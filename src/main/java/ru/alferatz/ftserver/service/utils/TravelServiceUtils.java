@@ -1,5 +1,6 @@
 package ru.alferatz.ftserver.service.utils;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -70,12 +71,16 @@ public class TravelServiceUtils {
   }
 
   public boolean isTravelChanged(TravelEntity travelEntity, TravelDto travelDto) {
-    return !travelEntity.getCountOfParticipants().equals(travelDto.getCountOfParticipants()) ||
+    return
         !travelEntity.getPlaceFrom().equals(travelDto.getPlaceFrom()) ||
         !travelEntity.getPlaceTo().equals(travelDto.getPlaceTo()) ||
         !travelEntity.getComment().trim().toLowerCase(Locale.ROOT)
             .equals(travelDto.getComment().trim().toLowerCase(
-                Locale.ROOT));
+                Locale.ROOT)) ||
+        travelEntity.getStartTime().isBefore(LocalDateTime.parse(travelDto.getStartTime())) ||
+        !travelEntity.getPlaceFromCoords().equals(travelDto.getPlaceFromCoords()) ||
+        !travelEntity.getPlaceToCoords().equals(travelDto.getPlaceToCoords());
+
   }
 
   public List<UserDto> getUserDtoListFromUserEntityList(UserRepository userRepository,

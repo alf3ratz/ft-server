@@ -61,4 +61,6 @@ public class TravelEntity {
   //@Type(type = "jsonb")
   @Column(columnDefinition = "jsonb")
   private CoordsObject placeToCoords;
+
+  private Integer price;
 }
